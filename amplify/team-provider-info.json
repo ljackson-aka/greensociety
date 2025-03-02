@@ -1,14 +1,14 @@
 {
-  "dev": {
+  "main": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-greensociety-dev-a9c2a-authRole",
-      "UnauthRoleArn": "arn:aws:iam::536697230233:role/amplify-greensociety-dev-a9c2a-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::536697230233:role/amplify-greensociety-dev-a9c2a-authRole",
+      "AuthRoleName": "amplify-greensociety-main-cdada-authRole",
+      "UnauthRoleArn": "arn:aws:iam::536697230233:role/amplify-greensociety-main-cdada-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::536697230233:role/amplify-greensociety-main-cdada-authRole",
       "Region": "us-east-2",
-      "DeploymentBucketName": "amplify-greensociety-dev-a9c2a-deployment",
-      "UnauthRoleName": "amplify-greensociety-dev-a9c2a-unauthRole",
-      "StackName": "amplify-greensociety-dev-a9c2a",
-      "StackId": "arn:aws:cloudformation:us-east-2:536697230233:stack/amplify-greensociety-dev-a9c2a/0c8b2b30-f756-11ef-beb3-0a7f7e96aeed",
+      "DeploymentBucketName": "amplify-greensociety-main-cdada-deployment",
+      "UnauthRoleName": "amplify-greensociety-main-cdada-unauthRole",
+      "StackName": "amplify-greensociety-main-cdada",
+      "StackId": "arn:aws:cloudformation:us-east-2:536697230233:stack/amplify-greensociety-main-cdada/9c9ba970-f756-11ef-b170-0acffcbfec23",
       "AmplifyAppId": "djls8jg3axhlq"
     }
   }
