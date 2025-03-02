@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./StrainForm.css";
 
 const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
@@ -9,61 +9,23 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
 
   const API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
 
-  // 🛠 Ensure previousStrains is formatted correctly
-  console.log("🔍 Raw Previous Strains:", previousStrains);
-
-  let formattedStrains = [];
-  let strainTypeMap = {};
-
-  if (Array.isArray(previousStrains)) {
-    formattedStrains = previousStrains.map((strain) => {
-      if (typeof strain === "string") {
-        return { strain_name: strain, strain_type: "" }; // Default empty if no type
-      } else if (strain && strain.strain_name) {
-        return strain;
-      }
-      return null;
-    }).filter(Boolean);
-
-    // Create strain type lookup map
-    strainTypeMap = formattedStrains.reduce((acc, strain) => {
-      acc[strain.strain_name.toLowerCase().trim()] = strain.strain_type || "Unknown";
-      return acc;
-    }, {});
-  }
-
-  console.log("✅ Formatted Strains for Dropdown:", formattedStrains);
-  console.log("📌 Strain Type Mapping:", strainTypeMap);
-
-  // Auto-fill strain type when a strain is selected
-  useEffect(() => {
-    if (strainName) {
-      const normalizedStrain = strainName.toLowerCase().trim();
-      if (strainTypeMap[normalizedStrain] && strainTypeMap[normalizedStrain] !== "Unknown") {
-        setStrainType(strainTypeMap[normalizedStrain]); // ✅ Auto-fill strain type
-        console.log("🔄 Auto-filled Strain Type:", strainTypeMap[normalizedStrain]);
-      } else {
-        setStrainType(""); // Reset if no match
-      }
-    }
-  }, [strainName]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (!strainName || !strainType || !method) {
       setMessage("All fields are required!");
       return;
     }
 
     const formData = {
-      user_id: userId,
+      user_id: userId, // User ID is email (from Cognito)
       strain_name: strainName,
       strain_type: strainType,
       method: method,
     };
 
     try {
+      // Send POST request to log strain entry
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -74,17 +36,19 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      console.log("✅ Success:", await response.json());
+      const data = await response.json();
+      console.log("Success:", data);
       setMessage("Entry logged successfully!");
-
-      // Reset form
+      
+      // Reset form fields
       setStrainName("");
       setStrainType("");
       setMethod("");
 
       if (onEntryLogged) onEntryLogged();
+
     } catch (error) {
-      console.error("❌ Error:", error);
+      console.error("Error:", error);
       setMessage(`Failed to submit: ${error.message}`);
     }
   };
@@ -94,41 +58,43 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
       <h2>Log Your Strain</h2>
       {message && <p className="form-message">{message}</p>}
       <form onSubmit={handleSubmit}>
-        <label>
-          Strain Name:
-          <input
-            type="text"
-            list="strain-options"
-            value={strainName}
-            onChange={(e) => setStrainName(e.target.value)}
-            required
-          />
-          <datalist id="strain-options">
-            {formattedStrains.map((strain, index) => (
-              <option key={index} value={strain.strain_name} />
-            ))}
-          </datalist>
-        </label>
+        <div className="form-grid">
+          <div className="form-group">
+            <label>Strain Name:</label>
+            <input
+              type="text"
+              list="strain-options"
+              value={strainName}
+              onChange={(e) => setStrainName(e.target.value)}
+              required
+            />
+            <datalist id="strain-options">
+              {previousStrains.map((strain, index) => (
+                <option key={index} value={strain} />
+              ))}
+            </datalist>
+          </div>
 
-        <label>
-          Strain Type:
-          <select value={strainType} onChange={(e) => setStrainType(e.target.value)} required>
-            <option value="">Select Type</option>
-            <option value="Indica">Indica</option>
-            <option value="Sativa">Sativa</option>
-            <option value="Hybrid">Hybrid</option>
-          </select>
-        </label>
+          <div className="form-group">
+            <label>Strain Type:</label>
+            <select value={strainType} onChange={(e) => setStrainType(e.target.value)} required>
+              <option value="">Select Type</option>
+              <option value="Indica">Indica</option>
+              <option value="Sativa">Sativa</option>
+              <option value="Hybrid">Hybrid</option>
+            </select>
+          </div>
 
-        <label>
-          Method:
-          <select value={method} onChange={(e) => setMethod(e.target.value)} required>
-            <option value="">Select Method</option>
-            <option value="Blunt">Blunt</option>
-            <option value="Joint">Joint</option>
-            <option value="Bowl">Bowl</option>
-          </select>
-        </label>
+          <div className="form-group">
+            <label>Method:</label>
+            <select value={method} onChange={(e) => setMethod(e.target.value)} required>
+              <option value="">Select Method</option>
+              <option value="Blunt">Blunt</option>
+              <option value="Joint">Joint</option>
+              <option value="Bowl">Bowl</option>
+            </select>
+          </div>
+        </div>
 
         <button type="submit">Log Entry</button>
       </form>
