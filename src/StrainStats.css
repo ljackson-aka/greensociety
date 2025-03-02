@@ -1,0 +1,120 @@
+/* StrainStats.css */
+.strain-stats {
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0 auto;
+  }
+  
+  .strain-stats h2 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    text-align: center;
+  }
+  
+  /* Preferred Metrics Section */
+  .preferred-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .preferred-item {
+    font-size: 1.1rem;
+  }
+  
+  .preferred-label {
+    font-weight: 700;
+    margin-right: 8px;
+    color: var(--accent-red, #ff4444);
+  }
+  
+  .preferred-value {
+    font-weight: 500;
+    color: #ffffff;
+  }
+  
+  /* Total Methods */
+  .stats-total {
+    margin-bottom: 25px;
+  }
+  
+  .stats-total h3 {
+    margin-bottom: 12px;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .stats-cell {
+    background: #ff4444; /* red background */
+    padding: 15px;
+    border-radius: 15px;
+    border: 1px solid #000000;
+  }
+  
+  .stats-header {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #ffffff;
+  }
+  
+  .stats-value {
+    font-size: 1.4rem;
+    color: #ffffff;
+  }
+  
+  /* Unique Strains Breakdown */
+  .stats-breakdown h3 {
+    margin-bottom: 12px;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: 2fr repeat(3, 1fr);
+    gap: 0;
+    text-align: center;
+    border: 1px solid #000000;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+  
+  .breakdown-row {
+    display: contents;
+  }
+  
+  .header-row {
+    background: #ff4444; /* red header */
+    font-weight: bold;
+    color: #ffffff;
+  }
+  
+  .breakdown-cell {
+    padding: 12px;
+    border-bottom: 1px solid #000000;
+    border-right: 1px solid #000000;
+    font-size: 1rem;
+  }
+  
+  .breakdown-cell.strain-name {
+    text-align: left;
+    padding-left: 15px;
+  }
+  
+  .breakdown-row:last-child .breakdown-cell {
+    border-bottom: none;
+  }
+  
+  .breakdown-cell:last-child {
+    border-right: none;
+  }
+  

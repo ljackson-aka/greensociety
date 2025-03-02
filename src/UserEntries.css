@@ -1,0 +1,82 @@
+.user-entries {
+    width: 100%;
+    padding: 15px;
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  .user-entries h2 {
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    text-align: center;
+    color: var(--text-color);
+  }
+  
+  .entries-container {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* Header row styling */
+  .entries-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+    gap: 10px;
+    padding: 10px;
+    background: #222;
+    color: #fff;
+    font-weight: bold;
+    border-bottom: 2px solid #444;
+    text-align: center;
+  }
+  
+  /* Entry row styling */
+  .entry-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #333;
+    transition: background 0.3s;
+    font-size: 0.95rem;
+  }
+  
+  .entry-row:hover {
+    background: rgba(255, 68, 68, 0.1);
+  }
+  
+  /* Ensure text stays aligned & prevents wrapping */
+  .entry-row span {
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Strain name styling */
+  .entry-name {
+    font-weight: bold;
+    color: var(--accent-red);
+    text-align: left;
+    padding-left: 10px;
+  }
+  
+  /* Timestamp alignment */
+  .entry-timestamp {
+    color: #bbbbbb;
+    text-align: right;
+    padding-right: 10px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .entries-header,
+    .entry-row {
+      grid-template-columns: 1fr 1fr 1fr 1fr; /* Evenly distributed in smaller screens */
+      font-size: 0.85rem;
+    }
+  }
+  

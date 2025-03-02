@@ -1,0 +1,84 @@
+.strain-form {
+    color: var(--text-color);
+    max-width: 600px;
+    margin: auto;
+    padding: 15px;
+  }
+  
+  .strain-form h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .form-message {
+    color: var(--accent-red);
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  /* Grid Layout for Inputs */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    align-items: center;
+  }
+  
+  /* Ensure elements align properly */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .form-group label {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    text-align: center;
+  }
+  
+  /* Input fields and select boxes */
+  .strain-form input,
+  .strain-form select {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: #222;
+    color: var(--text-color);
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  /* Button styling */
+  .strain-form button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px;
+    background-color: var(--accent-red);
+    color: var(--text-color);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+  }
+  
+  .strain-form button:hover {
+    background-color: #cc0000;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 600px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .form-group {
+      width: 100%;
+    }
+  }
+  

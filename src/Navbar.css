@@ -1,0 +1,53 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #000000;
+    padding: 20px 30px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid #ff4444;
+}
+
+.navbar-brand {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.navbar-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-links li a {
+    font-size: 1rem;
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.navbar-links li a:hover {
+    color: #ff4444;
+}
+
+/* Fix for Sign Out button */
+.signout-btn {
+    font-size: 1rem;
+    color: #ffffff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+    text-decoration: none;
+    font-family: inherit;
+    padding: 0;
+}
+
+.signout-btn:hover {
+    color: #ff4444;
+}

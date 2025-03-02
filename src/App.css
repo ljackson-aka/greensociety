@@ -1,0 +1,45 @@
+/* App.css */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.main-content {
+  padding: 20px 0;
+}
+
+.submission-form {
+  position: sticky;
+  top: 80px; /* below navbar */
+  background: var(--secondary-bg);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: var(--border-radius);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--card-shadow);
+}
+
+.content {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stats-panel {
+  flex: 1;
+  min-width: 280px;
+  background: var(--secondary-bg);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.entries-panel {
+  flex: 2;
+  min-width: 300px;
+  background: var(--secondary-bg);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+}
