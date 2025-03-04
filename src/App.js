@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "./Navbar";
 import StrainForm from "./StrainForm";
@@ -15,7 +14,7 @@ const API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/str
 
 const App = () => {
   const [userId, setUserId] = useState(null);
-  // Removed displayName and isTrailblazer because they are now managed in Navbar.
+  const [isTrailblazer, setIsTrailblazer] = useState(false);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,6 +28,8 @@ const App = () => {
       try {
         const user = await Auth.currentAuthenticatedUser();
         setUserId(user.attributes.email);
+        // Set isTrailblazer based on Cognito custom attribute
+        setIsTrailblazer(user.attributes["custom:isTrailblazer"] === "true");
       } catch (error) {
         setUserId(null);
       }
@@ -97,8 +98,9 @@ const App = () => {
     if (view === "home") {
       return (
         <div className="landing">
-          <h1>Welcome to Club Redstone</h1>
-          <p>Please sign in or sign up to continue.</p>
+          <h1>Join Club Redstone</h1>
+          <p>1. No backlogging. If you forget to log a smoke session, move on and get better. 2. Rank up.</p>
+          <p>Please sign in or sign up to play.</p>
         </div>
       );
     } else if (view === "signin") {
@@ -127,7 +129,8 @@ const App = () => {
           </div>
           <div className="badges-box">
             <h3>Badges</h3>
-            <TrailblazerBadge isTrailblazer={true} />
+            {/* Use the isTrailblazer state from Cognito */}
+            <TrailblazerBadge isTrailblazer={isTrailblazer} />
           </div>
           <div className="content">
             <div className="stats-panel">
