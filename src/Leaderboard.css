@@ -1,0 +1,31 @@
+/* Leaderboard.css */
+.leaderboard-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 10px;
+    background: var(--secondary-bg, #fff);
+    border-radius: var(--border-radius, 4px);
+    box-shadow: var(--card-shadow, 0 2px 4px rgba(0,0,0,0.1));
+    text-align: center;
+  }
+  
+  .leaderboard-container h2 {
+    font-size: 2em;
+    margin-bottom: 10px;
+  }
+  
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .leaderboard-table th {
+    font-weight: bold;
+  }
+  

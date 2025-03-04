@@ -1,32 +1,30 @@
-/* 🔥 Reset styles to remove unwanted parent influence */
+/* Comment out reset for testing 
 .trailblazer-badge, .trailblazer-icon {
     all: unset !important;
 }
+*/
 
-/* 🔥 Small & Properly Sized Trailblazer Badge */
 .trailblazer-badge {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    margin-top: 5px !important; /* Space below "Badges" title */
-    width: 50px !important; /* Keeps it small */
+    margin-top: 5px !important;
+    width: 50px !important;
     height: 50px !important;
-    background: none !important; /* No background */
-    border: none !important; /* No box */
-    box-shadow: none !important; /* No shadow */
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
-/* 🔥 Small Trailblazer Icon (No Box, No Text) */
 .trailblazer-icon {
-    width: 40px !important; /* Keeps it proportional */
+    width: 40px !important;
     height: 40px !important;
-    border-radius: 50% !important; /* Keep it circular */
+    border-radius: 50% !important;
 }
 
-/* 🔥 Ensure Badge Aligns Under "Badges" Title */
 .badges-box {
     display: flex !important;
-    flex-direction: column !important; /* Stack elements vertically */
+    flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
     margin-top: 10px !important;

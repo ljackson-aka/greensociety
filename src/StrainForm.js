@@ -55,7 +55,7 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
 
   return (
     <div className="strain-form">
-      <h2>Log Your Strain</h2>
+      <h2>Add Session</h2>
       {message && <p className="form-message">{message}</p>}
       <form onSubmit={handleSubmit}>
         <div className="form-grid">

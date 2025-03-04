@@ -5,6 +5,7 @@ import UserEntries from "./UserEntries";
 import StrainStats from "./StrainStats";
 import XPProgressBar from "./XPProgressBar"; // XP progress bar component
 import TrailblazerBadge from "./TrailblazerBadge"; // Trailblazer badge component
+import Leaderboard from "./Leaderboard"; // New Leaderboard component
 import "./App.css";
 import { Auth } from "aws-amplify";
 
@@ -18,6 +19,7 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(false); // Trigger re-fetch after entry is logged
+  const [view, setView] = useState("dashboard"); // "dashboard" or "leaderboard"
 
   // Get authenticated user info from Cognito
   useEffect(() => {
@@ -33,6 +35,21 @@ const App = () => {
       }
     };
     fetchUser();
+  }, []);
+
+  // Listen for URL hash changes to determine which view to show.
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === "#leaderboard") {
+        setView("leaderboard");
+      } else {
+        setView("dashboard");
+      }
+    };
+    window.addEventListener("hashchange", handleHashChange);
+    // Check initial hash
+    handleHashChange();
+    return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
   // Wrap fetchEntries in useCallback to avoid dependency warnings.
@@ -79,42 +96,48 @@ const App = () => {
     <div className="app-container">
       <Navbar userId={displayName} />
       {userId ? (
-        <div className="main-content">
-          <div className="submission-form">
-            <StrainForm
-              userId={userId}
-              onEntryLogged={handleEntryLogged}
-              previousStrains={previousStrains}
-            />
-          </div>
-          {/* XP progress bar container stretches full width with centered text */}
-          <div className="xp-container">
-            <XPProgressBar userId={userId} triggerUpdate={refresh} />
-          </div>
+        <>
+          {view === "leaderboard" ? (
+            <Leaderboard />
+          ) : (
+            <div className="main-content">
+              <div className="submission-form">
+                <StrainForm
+                  userId={userId}
+                  onEntryLogged={handleEntryLogged}
+                  previousStrains={previousStrains}
+                />
+              </div>
+              {/* XP progress bar container stretches full width with centered text */}
+              <div className="xp-container">
+                <XPProgressBar userId={userId} triggerUpdate={refresh} />
+              </div>
 
-          {/* Badges Section */}
-          <div className="badges-box">
-            <h3>Badges</h3>
-            <TrailblazerBadge isTrailblazer={isTrailblazer} />
-          </div>
+              {/* Badges Section */}
+              <div className="badges-box">
+                <h3>Badges</h3>
+                <TrailblazerBadge isTrailblazer={isTrailblazer} />
+              </div>
 
-          <div className="content">
-            <div className="stats-panel">
-              <StrainStats entries={entries} />
+              <div className="content">
+                <div className="stats-panel">
+                  <StrainStats entries={entries} />
+                </div>
+                <div className="entries-panel">
+                  {loading ? (
+                    <p className="loading">Loading entries...</p>
+                  ) : error ? (
+                    <p className="error">Error: {error}</p>
+                  ) : (
+                    <UserEntries entries={entries} />
+                  )}
+                  {/* Uncomment the Load More button if needed */}
+                  {/* <button className="load-more-button">Load More</button> */}
+                </div>
+              </div>
             </div>
-            <div className="entries-panel">
-              {loading ? (
-                <p className="loading">Loading entries...</p>
-              ) : error ? (
-                <p className="error">Error: {error}</p>
-              ) : (
-                <UserEntries entries={entries} />
-              )}
-              {/* Uncomment the Load More button if needed */}
-              {/* <button className="load-more-button">Load More</button> */}
-            </div>
-          </div>
-        </div>
+          )}
+        </>
       ) : (
         <div className="landing">
           <h1>Welcome to Club Redstone</h1>
