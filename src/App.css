@@ -3,7 +3,7 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 15px;
-  overflow-x: auto; /* Prevents content from cutting off */
+  overflow-x: auto; /* Prevents horizontal scrolling issues */
 }
 
 /* 🔥 Main Content */
@@ -53,20 +53,29 @@
 }
 
 /* 🔥 Admin Table */
+.admin-user-management {
+  width: 100%;
+  overflow-x: auto; /* Enables horizontal scrolling if needed */
+}
+
+/* 🔥 Table Container */
 .admin-user-management table {
   width: 100%;
   border-collapse: collapse;
   min-width: 850px; /* Ensures proper visibility */
   overflow-x: auto;
+  display: block;
+  white-space: nowrap; /* Prevents text wrapping */
 }
 
-/* 🔥 Table Cells */
+/* 🔥 Table Headers & Cells */
 .admin-user-management th,
 .admin-user-management td {
-  white-space: nowrap;
   text-align: center;
-  padding: 8px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
   vertical-align: middle; /* Aligns content properly */
+  white-space: nowrap;
 }
 
 /* 🔥 Fix Empty Box Issue */
@@ -81,6 +90,7 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap; /* Ensures buttons don't overflow */
 }
 
 /* 🔥 Buttons */
@@ -91,6 +101,8 @@
   margin: 3px;
   display: inline-block;
   border-radius: 4px;
+  flex: 1; /* Ensures buttons are responsive */
+  max-width: 120px;
 }
 
 /* 🔥 Ban Button */
@@ -120,6 +132,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap; /* Prevents overflow */
 }
 
 /* 🔥 Badge Image */
@@ -148,7 +161,33 @@
   background-color: rgba(0, 0, 0, 0.07);
 }
 
-/* 🔥 Responsive Table */
+/* 🔥 Ensure all user info displays properly on mobile */
+@media (max-width: 1024px) {
+  .content {
+    flex-direction: column; /* Stack panels vertically */
+  }
+
+  .stats-panel,
+  .entries-panel {
+    width: 100%;
+  }
+
+  .admin-user-management {
+    overflow-x: auto;
+  }
+
+  .admin-user-management table {
+    width: 100%;
+    min-width: unset; /* Allows table to fit smaller screens */
+  }
+
+  .admin-user-management td:last-child {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* 🔥 Ensure all user info displays properly on mobile screens */
 @media (max-width: 768px) {
   .admin-dashboard {
     padding: 10px;
@@ -156,29 +195,69 @@
 
   .admin-user-management table {
     display: block;
+    width: 100%;
+    min-width: 600px;
     overflow-x: auto;
   }
 
   .admin-user-management th,
   .admin-user-management td {
     font-size: 14px;
-    padding: 5px;
+    padding: 6px;
   }
 
   .admin-user-management td:last-child {
     flex-direction: column;
+    align-items: center;
     gap: 4px;
+  }
+
+  .admin-user-management button {
+    width: 100%;
+    max-width: 140px;
+    padding: 6px 10px;
   }
 }
 
-/* 🔥 Ensure no extra empty space in panels */
+/* 🔥 Full Mobile Support (For Small Screens) */
 @media (max-width: 600px) {
   .content {
     flex-direction: column;
+    gap: 10px;
   }
 
   .stats-panel,
   .entries-panel {
     width: 100%;
+  }
+
+  .admin-user-management {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .admin-user-management table {
+    display: block;
+    width: 100%;
+    min-width: 500px;
+    overflow-x: auto;
+  }
+
+  .admin-user-management th,
+  .admin-user-management td {
+    font-size: 13px;
+    padding: 4px;
+  }
+
+  .admin-user-management td:last-child {
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .admin-user-management button {
+    width: 100%;
+    max-width: 120px;
+    padding: 5px 8px;
   }
 }
