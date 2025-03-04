@@ -1,25 +1,24 @@
-/* Comment out reset for testing 
-.trailblazer-badge, .trailblazer-icon {
-    all: unset !important;
-}
-*/
-
 .trailblazer-badge {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     margin-top: 5px !important;
-    width: 50px !important;
-    height: 50px !important;
+    width: 133px !important;  /* increased by one-third from 100px */
+    height: 133px !important; /* increased by one-third from 100px */
     background: none !important;
     border: none !important;
     box-shadow: none !important;
 }
 
 .trailblazer-icon {
-    width: 40px !important;
-    height: 40px !important;
+    width: 107px !important;  /* increased by one-third from 80px */
+    height: 107px !important; /* increased by one-third from 80px */
     border-radius: 50% !important;
+    object-fit: contain; /* Ensures the entire image is visible */
+}
+
+.badge-text {
+    display: none; /* Hide any text */
 }
 
 .badges-box {

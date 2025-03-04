@@ -1,5 +1,6 @@
 import React from "react";
-import badgeImage from "./TrailblazerBadge.png.webp"; // image is directly under src
+import "./TrailblazerBadge.css";
+import badgeImage from "./TrailblazerBadge.png.webp"; // Image file located directly under src
 
 const TrailblazerBadge = ({ isTrailblazer }) => {
   if (!isTrailblazer) return null;
