@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "./Navbar";
 import StrainForm from "./StrainForm";
 import UserEntries from "./UserEntries";
 import StrainStats from "./StrainStats";
-import XPProgressBar from "./XPProgressBar"; // <-- Import the XP progress bar component
+import XPProgressBar from "./XPProgressBar"; // XP progress bar component
+import TrailblazerBadge from "./TrailblazerBadge"; // Trailblazer badge component
 import "./App.css";
 import { Auth } from "aws-amplify";
 
@@ -11,20 +12,22 @@ const API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/str
 
 const App = () => {
   const [userId, setUserId] = useState(null);
-  const [displayName, setDisplayName] = useState(""); // Store preferred_username
+  const [displayName, setDisplayName] = useState(""); // preferred_username or email
+  const [isTrailblazer, setIsTrailblazer] = useState(false);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // This state is used to trigger a re-fetch of entries (and XP) after a new entry is logged.
-  const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState(false); // Trigger re-fetch after entry is logged
 
-  // Get the authenticated user info from Cognito
+  // Get authenticated user info from Cognito
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const user = await Auth.currentAuthenticatedUser();
-        setUserId(user.attributes.email); // Use email as the unique identifier
+        setUserId(user.attributes.email);
         setDisplayName(user.attributes.preferred_username || user.attributes.email);
+        // Check custom attribute "custom:isTrailblazer"
+        setIsTrailblazer(user.attributes["custom:isTrailblazer"] === "true");
       } catch (error) {
         console.log("Error fetching user: ", error);
       }
@@ -32,8 +35,8 @@ const App = () => {
     fetchUser();
   }, []);
 
-  // Function to fetch strain entries
-  const fetchEntries = async () => {
+  // Wrap fetchEntries in useCallback to avoid dependency warnings.
+  const fetchEntries = useCallback(async () => {
     if (!userId) return;
     setLoading(true);
     try {
@@ -55,38 +58,46 @@ const App = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
-  // Refetch entries (and thereby XP) when userId or refresh changes.
+  // Refetch entries (and XP) when userId, refresh, or fetchEntries changes.
   useEffect(() => {
     if (userId) {
       fetchEntries();
     }
-  }, [userId, refresh]);
+  }, [userId, refresh, fetchEntries]);
 
   // Called when a new entry is successfully logged.
   const handleEntryLogged = () => {
-    setRefresh(prev => !prev);
+    setRefresh((prev) => !prev);
   };
 
   // Compute unique strains for autocomplete in the form.
-  const previousStrains = [...new Set(entries.map(entry => entry.strain_name))];
+  const previousStrains = [...new Set(entries.map((entry) => entry.strain_name))];
 
   return (
     <div className="app-container">
-      <Navbar userId={displayName} /> {/* Show preferred_username instead of userId */}
+      <Navbar userId={displayName} />
       {userId ? (
         <div className="main-content">
           <div className="submission-form">
-            <StrainForm 
-              userId={userId} 
-              onEntryLogged={handleEntryLogged} 
-              previousStrains={previousStrains} 
+            <StrainForm
+              userId={userId}
+              onEntryLogged={handleEntryLogged}
+              previousStrains={previousStrains}
             />
           </div>
-          {/* Display the XP progress bar below the submission form.
-              The XPProgressBar component calls the XP Lambda endpoint internally via xpService.js */}
-          <XPProgressBar userId={userId} triggerUpdate={refresh} />
+          {/* XP progress bar container stretches full width with centered text */}
+          <div className="xp-container">
+            <XPProgressBar userId={userId} triggerUpdate={refresh} />
+          </div>
+
+          {/* Badges Section */}
+          <div className="badges-box">
+            <h3>Badges</h3>
+            <TrailblazerBadge isTrailblazer={isTrailblazer} />
+          </div>
+
           <div className="content">
             <div className="stats-panel">
               <StrainStats entries={entries} />
@@ -99,6 +110,8 @@ const App = () => {
               ) : (
                 <UserEntries entries={entries} />
               )}
+              {/* Uncomment the Load More button if needed */}
+              {/* <button className="load-more-button">Load More</button> */}
             </div>
           </div>
         </div>

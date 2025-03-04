@@ -2,19 +2,19 @@
 .app-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 10px; /* reduced padding */
 }
 
 .main-content {
-  padding: 20px 0;
+  padding: 10px 0; /* reduced vertical padding */
 }
 
 .submission-form {
   position: sticky;
   top: 80px; /* below navbar */
   background: var(--secondary-bg);
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 15px; /* slightly reduced padding */
+  margin-bottom: 10px; /* reduced bottom margin */
   border-radius: var(--border-radius);
   backdrop-filter: blur(8px);
   box-shadow: var(--card-shadow);
@@ -22,7 +22,7 @@
 
 .content {
   display: flex;
-  gap: 20px;
+  gap: 15px; /* reduced gap between panels */
   flex-wrap: wrap;
 }
 
@@ -30,7 +30,7 @@
   flex: 1;
   min-width: 280px;
   background: var(--secondary-bg);
-  padding: 20px;
+  padding: 15px; /* reduced padding */
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
 }
@@ -39,88 +39,93 @@
   flex: 2;
   min-width: 300px;
   background: var(--secondary-bg);
-  padding: 20px;
+  padding: 15px; /* reduced padding */
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
+  margin-top: 5px; /* reduced margin */
+  margin-bottom: 5px;
 }
 
-/* Load More Button */
+/* 🔥 XP Container: full width with centered text and slightly reduced vertical margin */
+.xp-container {
+  width: 100%;
+  margin: 3px 0;
+  text-align: center;
+}
+
+/* 🔥 Sample rule for the XP level text – adjust the selector as needed */
+.xp-level {
+  font-size: 1.6em; /* larger level text */
+  font-weight: bold;
+}
+
+/* 🔥 Badges box: reduced gap and margins between the "Badges" title and the badge */
+.badges-box {
+  display: flex;
+  flex-direction: column; /* Stack title and badge vertically */
+  align-items: center; /* Center everything */
+  justify-content: center;
+  padding: 2px 0; /* minimal padding */
+  margin: 1px 0;  /* reduced overall margin */
+  gap: 1px; /* reduced gap between title & badge */
+}
+
+/* Make the "Badges" title slightly larger */
+.badges-box h3 {
+  font-size: 1.6em; /* increased font size */
+  margin: 0; /* remove default margin */
+}
+
+/* 🔥 Full Circular Trailblazer Badge Container */
+.trailblazer-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 130px;  /* Container size */
+  height: 130px;
+  border-radius: 50%; /* Full circle */
+  background: none;
+  border: none;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+/* 🔥 Full Circular Trailblazer Icon */
+.trailblazer-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 🔥 Hide any extra text inside the badge */
+.trailblazer-badge span,
+.trailblazer-badge p {
+  display: none;
+}
+
+/* 🔥 Load More Button styled like the rest of the app and centered */
 .load-more-button {
-  display: block;                   /* Block-level element to center with margin auto */
-  margin: 20px auto;                /* 20px margin top/bottom, centered horizontally */
-  padding: 10px 20px;               /* Adequate padding for better clickability */
-  background: var(--secondary-bg);  /* Match background of your panels */
-  border: 2px solid var(--primary-color); /* Use primary color for border */
-  border-radius: var(--border-radius);    /* Consistent rounded corners */
-  box-shadow: var(--card-shadow);         /* Use same shadow as your panels */
-  font-size: 1rem;
-  color: var(--primary-color);      /* Text color matching the primary color */
+  display: block;
+  margin: 10px auto; /* reduced margin */
+  padding: 8px 16px; /* reduced padding */
+  background-color: var(--primary-bg, #f0f0f0);
+  border: none;
+  border-radius: var(--border-radius, 4px);
+  box-shadow: var(--card-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
+  font-size: 16px;
+  color: var(--text-color, #333);
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 .load-more-button:hover {
-  background: var(--primary-color); /* Invert background on hover */
-  color: #fff;                      /* White text on hover */
+  background-color: var(--primary-hover, #e0e0e0);
 }
 
-/* Level Update Glow Animation */
-@keyframes glow {
-  0% {
-    color: inherit;
-    text-shadow: none;
-  }
-  50% {
-    color: gold;
-    text-shadow: 0 0 10px gold, 0 0 20px gold, 0 0 30px gold;
-  }
-  100% {
-    color: inherit;
-    text-shadow: none;
-  }
-}
-
-.level-update {
-  animation: glow 1s ease;
-}
-
-/* Ranked Up Message Animation */
-@keyframes rankUpAnimation {
-  0% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-}
-
-.ranked-up {
-  display: inline-block;
-  margin-left: 10px;
-  font-weight: bold;
-  color: gold;
-  animation: rankUpAnimation 2s ease;
-}
-
-/* Mobile Optimization */
-@media screen and (max-width: 600px) {
-  .app-container {
-    max-width: 100%;
-    padding: 10px;
-  }
-  
-  .submission-form {
-    padding: 10px;
-  }
-  
-  .content {
-    flex-direction: column;
-    gap: 10px;
-  }
+/* 🔥 Reduce top and bottom margins for individual user entries */
+.user-entry {
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
