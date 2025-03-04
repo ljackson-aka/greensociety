@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import "./UserEntries.css";
 
 const UserEntries = ({ entries }) => {
+  // Use state to track how many entries are visible.
+  const [visibleCount, setVisibleCount] = useState(10);
+
   if (!entries || entries.length === 0) {
     return (
       <div className="user-entries">
@@ -11,7 +14,7 @@ const UserEntries = ({ entries }) => {
     );
   }
 
-  // Format timestamp for better readability
+  // Format timestamp for better readability.
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return "Unknown Date";
     const date = new Date(timestamp);
@@ -26,10 +29,16 @@ const UserEntries = ({ entries }) => {
     });
   };
 
-  // Sort entries by timestamp (latest first), filtering out invalid dates
+  // Sort entries by timestamp (latest first), filtering out invalid dates.
   const sortedEntries = [...entries]
-    .filter((entry) => entry.timestamp && !isNaN(new Date(entry.timestamp).getTime()))
+    .filter(
+      (entry) =>
+        entry.timestamp && !isNaN(new Date(entry.timestamp).getTime())
+    )
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  // Only show the first "visibleCount" entries (newest first).
+  const visibleEntries = sortedEntries.slice(0, visibleCount);
 
   return (
     <div className="user-entries">
@@ -41,15 +50,29 @@ const UserEntries = ({ entries }) => {
           <span>Method</span>
           <span>Date</span>
         </div>
-        {sortedEntries.map((entry) => (
-          <div key={entry.entry_id || `${entry.strain_name}-${entry.timestamp}`} className="entry-row">
+        {visibleEntries.map((entry) => (
+          <div
+            key={entry.entry_id || `${entry.strain_name}-${entry.timestamp}`}
+            className="entry-row"
+          >
             <span className="entry-name">{entry.strain_name}</span>
             <span className="entry-type">{entry.strain_type}</span>
             <span className="entry-method">{entry.method}</span>
-            <span className="entry-timestamp">{formatTimestamp(entry.timestamp)}</span>
+            <span className="entry-timestamp">
+              {formatTimestamp(entry.timestamp)}
+            </span>
           </div>
         ))}
       </div>
+      {/* Show "Load More" button if there are more entries */}
+      {visibleCount < sortedEntries.length && (
+        <button
+          className="load-more-button"
+          onClick={() => setVisibleCount(visibleCount + 10)}
+        >
+          Load More
+        </button>
+      )}
     </div>
   );
 };

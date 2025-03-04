@@ -43,3 +43,67 @@
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
 }
+
+/* Load More Button */
+.load-more-button {
+  display: block;                   /* Block-level element to center with margin auto */
+  margin: 20px auto;                /* 20px margin top/bottom, centered horizontally */
+  padding: 10px 20px;               /* Adequate padding for better clickability */
+  background: var(--secondary-bg);  /* Match background of your panels */
+  border: 2px solid var(--primary-color); /* Use primary color for border */
+  border-radius: var(--border-radius);    /* Consistent rounded corners */
+  box-shadow: var(--card-shadow);         /* Use same shadow as your panels */
+  font-size: 1rem;
+  color: var(--primary-color);      /* Text color matching the primary color */
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.load-more-button:hover {
+  background: var(--primary-color); /* Invert background on hover */
+  color: #fff;                      /* White text on hover */
+}
+
+/* Level Update Glow Animation */
+@keyframes glow {
+  0% {
+    color: inherit;
+    text-shadow: none;
+  }
+  50% {
+    color: gold;
+    text-shadow: 0 0 10px gold, 0 0 20px gold, 0 0 30px gold;
+  }
+  100% {
+    color: inherit;
+    text-shadow: none;
+  }
+}
+
+.level-update {
+  animation: glow 1s ease;
+}
+
+/* Ranked Up Message Animation */
+@keyframes rankUpAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.ranked-up {
+  display: inline-block;
+  margin-left: 10px;
+  font-weight: bold;
+  color: gold;
+  animation: rankUpAnimation 2s ease;
+}

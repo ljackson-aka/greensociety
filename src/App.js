@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import StrainForm from "./StrainForm";
 import UserEntries from "./UserEntries";
 import StrainStats from "./StrainStats";
+import XPProgressBar from "./XPProgressBar"; // <-- Import the XP progress bar component
 import "./App.css";
 import { Auth } from "aws-amplify";
 
@@ -14,6 +15,7 @@ const App = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // This state is used to trigger a re-fetch of entries (and XP) after a new entry is logged.
   const [refresh, setRefresh] = useState(false);
 
   // Get the authenticated user info from Cognito
@@ -22,8 +24,7 @@ const App = () => {
       try {
         const user = await Auth.currentAuthenticatedUser();
         setUserId(user.attributes.email); // Use email as the unique identifier
-        setDisplayName(user.attributes.preferred_username || user.attributes.email); 
-        // 👆 Display preferred_username, fallback to email if missing
+        setDisplayName(user.attributes.preferred_username || user.attributes.email);
       } catch (error) {
         console.log("Error fetching user: ", error);
       }
@@ -31,7 +32,7 @@ const App = () => {
     fetchUser();
   }, []);
 
-  // Function to fetch entries (only runs when user is signed in)
+  // Function to fetch strain entries
   const fetchEntries = async () => {
     if (!userId) return;
     setLoading(true);
@@ -56,23 +57,24 @@ const App = () => {
     }
   };
 
-  // Refetch entries when userId or refresh changes
+  // Refetch entries (and thereby XP) when userId or refresh changes.
   useEffect(() => {
     if (userId) {
       fetchEntries();
     }
   }, [userId, refresh]);
 
+  // Called when a new entry is successfully logged.
   const handleEntryLogged = () => {
     setRefresh(prev => !prev);
   };
 
-  // Compute unique strains for autocomplete
+  // Compute unique strains for autocomplete in the form.
   const previousStrains = [...new Set(entries.map(entry => entry.strain_name))];
 
   return (
     <div className="app-container">
-      <Navbar userId={displayName} /> {/* 👈 Show preferred_username instead of userId */}
+      <Navbar userId={displayName} /> {/* Show preferred_username instead of userId */}
       {userId ? (
         <div className="main-content">
           <div className="submission-form">
@@ -82,6 +84,9 @@ const App = () => {
               previousStrains={previousStrains} 
             />
           </div>
+          {/* Display the XP progress bar below the submission form.
+              The XPProgressBar component calls the XP Lambda endpoint internally via xpService.js */}
+          <XPProgressBar userId={userId} triggerUpdate={refresh} />
           <div className="content">
             <div className="stats-panel">
               <StrainStats entries={entries} />
