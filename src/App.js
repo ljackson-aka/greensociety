@@ -14,6 +14,7 @@ const API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/str
 const App = () => {
   const [userId, setUserId] = useState(null);
   const [displayName, setDisplayName] = useState(""); // preferred_username or email
+  // eslint-disable-next-line no-unused-vars
   const [isTrailblazer, setIsTrailblazer] = useState(false);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,7 +117,8 @@ const App = () => {
               {/* Badges Section */}
               <div className="badges-box">
                 <h3>Badges</h3>
-                <TrailblazerBadge isTrailblazer={isTrailblazer} />
+                {/* For testing, force isTrailblazer to true */}
+                <TrailblazerBadge isTrailblazer={true} />
               </div>
 
               <div className="content">
