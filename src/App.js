@@ -1,11 +1,13 @@
+// App.js
 import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "./Navbar";
 import StrainForm from "./StrainForm";
 import UserEntries from "./UserEntries";
 import StrainStats from "./StrainStats";
-import XPProgressBar from "./XPProgressBar"; // XP progress bar component
-import TrailblazerBadge from "./TrailblazerBadge"; // Trailblazer badge component
-import Leaderboard from "./Leaderboard"; // New Leaderboard component
+import XPProgressBar from "./XPProgressBar";
+import TrailblazerBadge from "./TrailblazerBadge";
+import Leaderboard from "./Leaderboard";
+import SignIn from "./SignIn";
 import "./App.css";
 import { Auth } from "aws-amplify";
 
@@ -13,56 +15,57 @@ const API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/str
 
 const App = () => {
   const [userId, setUserId] = useState(null);
-  const [displayName, setDisplayName] = useState(""); // preferred_username or email
-  // eslint-disable-next-line no-unused-vars
-  const [isTrailblazer, setIsTrailblazer] = useState(false);
+  // Removed displayName and isTrailblazer because they are now managed in Navbar.
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [refresh, setRefresh] = useState(false); // Trigger re-fetch after entry is logged
-  const [view, setView] = useState("dashboard"); // "dashboard" or "leaderboard"
+  const [refresh, setRefresh] = useState(false);
+  // View can be: "home", "signin", "dashboard", or "leaderboard"
+  const [view, setView] = useState("home");
 
-  // Get authenticated user info from Cognito
+  // Check for an authenticated user
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const user = await Auth.currentAuthenticatedUser();
         setUserId(user.attributes.email);
-        setDisplayName(user.attributes.preferred_username || user.attributes.email);
-        // Check custom attribute "custom:isTrailblazer"
-        setIsTrailblazer(user.attributes["custom:isTrailblazer"] === "true");
       } catch (error) {
-        console.log("Error fetching user: ", error);
+        setUserId(null);
       }
     };
     fetchUser();
-  }, []);
+  }, [view]);
 
   // Listen for URL hash changes to determine which view to show.
   useEffect(() => {
     const handleHashChange = () => {
-      if (window.location.hash === "#leaderboard") {
+      const hash = window.location.hash;
+      if (hash === "#leaderboard") {
         setView("leaderboard");
-      } else {
+      } else if (hash === "#profile") {
         setView("dashboard");
+      } else if (hash === "#signin") {
+        setView("signin");
+      } else if (hash === "#home") {
+        setView("home");
+      } else {
+        // Default view: if signed in, show dashboard; otherwise, home.
+        setView(userId ? "dashboard" : "home");
       }
     };
     window.addEventListener("hashchange", handleHashChange);
-    // Check initial hash
     handleHashChange();
     return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
+  }, [userId]);
 
-  // Wrap fetchEntries in useCallback to avoid dependency warnings.
+  // Fetch entries if a user is signed in
   const fetchEntries = useCallback(async () => {
     if (!userId) return;
     setLoading(true);
     try {
       const requestUrl = `${API_URL}?user_id=${encodeURIComponent(userId)}&t=${Date.now()}`;
       const response = await fetch(requestUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP Error! Status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
       let rawData = await response.json();
       if (typeof rawData.body === "string") {
         rawData = JSON.parse(rawData.body);
@@ -78,74 +81,77 @@ const App = () => {
     }
   }, [userId]);
 
-  // Refetch entries (and XP) when userId, refresh, or fetchEntries changes.
   useEffect(() => {
     if (userId) {
       fetchEntries();
     }
   }, [userId, refresh, fetchEntries]);
 
-  // Called when a new entry is successfully logged.
   const handleEntryLogged = () => {
-    setRefresh((prev) => !prev);
+    setRefresh(prev => !prev);
   };
 
-  // Compute unique strains for autocomplete in the form.
-  const previousStrains = [...new Set(entries.map((entry) => entry.strain_name))];
+  const previousStrains = [...new Set(entries.map(entry => entry.strain_name))];
 
-  return (
-    <div className="app-container">
-      <Navbar userId={displayName} />
-      {userId ? (
-        <>
-          {view === "leaderboard" ? (
-            <Leaderboard />
-          ) : (
-            <div className="main-content">
-              <div className="submission-form">
-                <StrainForm
-                  userId={userId}
-                  onEntryLogged={handleEntryLogged}
-                  previousStrains={previousStrains}
-                />
-              </div>
-              {/* XP progress bar container stretches full width with centered text */}
-              <div className="xp-container">
-                <XPProgressBar userId={userId} triggerUpdate={refresh} />
-              </div>
-
-              {/* Badges Section */}
-              <div className="badges-box">
-                <h3>Badges</h3>
-                {/* For testing, force isTrailblazer to true */}
-                <TrailblazerBadge isTrailblazer={true} />
-              </div>
-
-              <div className="content">
-                <div className="stats-panel">
-                  <StrainStats entries={entries} />
-                </div>
-                <div className="entries-panel">
-                  {loading ? (
-                    <p className="loading">Loading entries...</p>
-                  ) : error ? (
-                    <p className="error">Error: {error}</p>
-                  ) : (
-                    <UserEntries entries={entries} />
-                  )}
-                  {/* Uncomment the Load More button if needed */}
-                  {/* <button className="load-more-button">Load More</button> */}
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      ) : (
+  const renderContent = () => {
+    if (view === "home") {
+      return (
         <div className="landing">
           <h1>Welcome to Club Redstone</h1>
           <p>Please sign in or sign up to continue.</p>
         </div>
-      )}
+      );
+    } else if (view === "signin") {
+      return (
+        <SignIn
+          onSignIn={() => {
+            window.location.hash = "#dashboard";
+            window.location.reload();
+          }}
+        />
+      );
+    } else if (view === "leaderboard") {
+      return <Leaderboard />;
+    } else if (view === "dashboard") {
+      return (
+        <div className="main-content">
+          <div className="submission-form">
+            <StrainForm
+              userId={userId}
+              onEntryLogged={handleEntryLogged}
+              previousStrains={previousStrains}
+            />
+          </div>
+          <div className="xp-container">
+            <XPProgressBar userId={userId} triggerUpdate={refresh} />
+          </div>
+          <div className="badges-box">
+            <h3>Badges</h3>
+            <TrailblazerBadge isTrailblazer={true} />
+          </div>
+          <div className="content">
+            <div className="stats-panel">
+              <StrainStats entries={entries} />
+            </div>
+            <div className="entries-panel">
+              {loading ? (
+                <p className="loading">Loading entries...</p>
+              ) : error ? (
+                <p className="error">Error: {error}</p>
+              ) : (
+                <UserEntries entries={entries} />
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className="app-container">
+      <Navbar />
+      {renderContent()}
     </div>
   );
 };
