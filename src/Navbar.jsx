@@ -5,15 +5,21 @@ import { Auth } from "aws-amplify";
 
 const Navbar = () => {
   const [displayName, setDisplayName] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const user = await Auth.currentAuthenticatedUser();
-        setDisplayName(user.attributes?.preferred_username || user.attributes?.email);
+        const name = user.attributes?.preferred_username || user.attributes?.email;
+        setDisplayName(name);
+        // Check if the user belongs to the Admin group.
+        const groups = user.signInUserSession.accessToken.payload["cognito:groups"] || [];
+        setIsAdmin(groups.includes("Admin"));
       } catch (error) {
         // No user logged in
         setDisplayName(null);
+        setIsAdmin(false);
       }
     };
 
@@ -45,6 +51,12 @@ const Navbar = () => {
         <li>
           <a href="#leaderboard">Leaderboard</a>
         </li>
+        {/* Admin link visible only to admin users */}
+        {isAdmin && (
+          <li>
+            <a href="#admin">Admin</a>
+          </li>
+        )}
         {displayName ? (
           <>
             <li>

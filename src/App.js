@@ -1,3 +1,4 @@
+// App.js
 import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "./Navbar";
 import StrainForm from "./StrainForm";
@@ -7,6 +8,7 @@ import XPProgressBar from "./XPProgressBar";
 import TrailblazerBadge from "./TrailblazerBadge";
 import Leaderboard from "./Leaderboard";
 import SignIn from "./SignIn";
+import AdminDashboard from "./AdminDashboard"; // new import
 import "./App.css";
 import { Auth } from "aws-amplify";
 
@@ -19,16 +21,15 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(false);
-  // View can be: "home", "signin", "dashboard", or "leaderboard"
+  // View can be: "home", "signin", "dashboard", "leaderboard", or "admin"
   const [view, setView] = useState("home");
 
-  // Check for an authenticated user
+  // Check for an authenticated user and set trailblazer status from Cognito custom attribute
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const user = await Auth.currentAuthenticatedUser();
         setUserId(user.attributes.email);
-        // Set isTrailblazer based on Cognito custom attribute
         setIsTrailblazer(user.attributes["custom:isTrailblazer"] === "true");
       } catch (error) {
         setUserId(null);
@@ -47,6 +48,8 @@ const App = () => {
         setView("dashboard");
       } else if (hash === "#signin") {
         setView("signin");
+      } else if (hash === "#admin") {
+        setView("admin");
       } else if (hash === "#home") {
         setView("home");
       } else {
@@ -99,7 +102,10 @@ const App = () => {
       return (
         <div className="landing">
           <h1>Join Club Redstone</h1>
-          <p>1. No backlogging. If you forget to log a smoke session, move on and get better. 2. Rank up.</p>
+          <p>
+            1. No backlogging. If you forget to log a smoke session, move on and get better.
+            2. Rank up.
+          </p>
           <p>Please sign in or sign up to play.</p>
         </div>
       );
@@ -114,6 +120,8 @@ const App = () => {
       );
     } else if (view === "leaderboard") {
       return <Leaderboard />;
+    } else if (view === "admin") {
+      return <AdminDashboard />;
     } else if (view === "dashboard") {
       return (
         <div className="main-content">
@@ -129,7 +137,6 @@ const App = () => {
           </div>
           <div className="badges-box">
             <h3>Badges</h3>
-            {/* Use the isTrailblazer state from Cognito */}
             <TrailblazerBadge isTrailblazer={isTrailblazer} />
           </div>
           <div className="content">
