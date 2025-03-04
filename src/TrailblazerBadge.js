@@ -3,7 +3,11 @@ const TrailblazerBadge = ({ isTrailblazer }) => {
     
     return (
       <div className="trailblazer-badge">
-        <img src="/TrailblazerBadge.png.webp" alt="Trailblazer Badge" className="trailblazer-icon" />
+        <img 
+          src="/TrailblazerBadge.png.webp" 
+          alt="Trailblazer Badge" 
+          className="trailblazer-icon" 
+        />
         <span className="badge-text">Trailblazer</span>
       </div>
     );
