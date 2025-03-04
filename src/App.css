@@ -1,131 +1,184 @@
-/* App.css */
+/* 🔥 General Layout */
 .app-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 10px; /* reduced padding */
+  padding: 15px;
+  overflow-x: auto; /* Prevents content from cutting off */
 }
 
+/* 🔥 Main Content */
 .main-content {
-  padding: 10px 0; /* reduced vertical padding */
+  padding: 10px 0;
 }
 
-.submission-form {
-  position: sticky;
-  top: 80px; /* below navbar */
-  background: var(--secondary-bg);
-  padding: 15px; /* slightly reduced padding */
-  margin-bottom: 10px; /* reduced bottom margin */
-  border-radius: var(--border-radius);
-  backdrop-filter: blur(8px);
-  box-shadow: var(--card-shadow);
+/* 🔥 Admin Dashboard Styling */
+.admin-dashboard {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 15px;
+  overflow-x: auto;
 }
 
+/* 🔥 Content Panels */
 .content {
   display: flex;
-  gap: 15px; /* reduced gap between panels */
+  gap: 15px;
   flex-wrap: wrap;
+  align-items: flex-start; /* Aligns panels properly */
 }
 
+/* 🔥 Stats Panel */
 .stats-panel {
   flex: 1;
   min-width: 280px;
   background: var(--secondary-bg);
-  padding: 15px; /* reduced padding */
+  padding: 15px;
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
+  height: auto; /* Adjusts height dynamically */
 }
 
+/* 🔥 Entries Panel */
 .entries-panel {
   flex: 2;
-  min-width: 300px;
+  min-width: 400px; /* Ensures better spacing */
   background: var(--secondary-bg);
-  padding: 15px; /* reduced padding */
+  padding: 15px;
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
-  margin-top: 5px; /* reduced margin */
+  margin-top: 5px;
   margin-bottom: 5px;
+  height: auto; /* Adjusts height dynamically */
 }
 
-/* 🔥 XP Container: full width with centered text and slightly reduced vertical margin */
-.xp-container {
+/* 🔥 Admin Table */
+.admin-user-management table {
   width: 100%;
-  margin: 3px 0;
+  border-collapse: collapse;
+  min-width: 850px; /* Ensures proper visibility */
+  overflow-x: auto;
+}
+
+/* 🔥 Table Cells */
+.admin-user-management th,
+.admin-user-management td {
+  white-space: nowrap;
   text-align: center;
+  padding: 8px;
+  vertical-align: middle; /* Aligns content properly */
 }
 
-/* 🔥 Sample rule for the XP level text – adjust the selector as needed */
-.xp-level {
-  font-size: 1.6em; /* larger level text */
-  font-weight: bold;
-}
-
-/* 🔥 Badges box: reduced gap and margins between the "Badges" title and the badge */
-.badges-box {
-  display: flex;
-  flex-direction: column; /* Stack title and badge vertically */
-  align-items: center; /* Center everything */
-  justify-content: center;
-  padding: 2px 0; /* minimal padding */
-  margin: 1px 0;  /* reduced overall margin */
-  gap: 1px; /* reduced gap between title & badge */
-}
-
-/* Make the "Badges" title slightly larger */
-.badges-box h3 {
-  font-size: 1.6em; /* increased font size */
-  margin: 0; /* remove default margin */
-}
-
-/* 🔥 Full Circular Trailblazer Badge Container */
-.trailblazer-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 130px;  /* Container size */
-  height: 130px;
-  border-radius: 50%; /* Full circle */
-  background: none;
-  border: none;
-  box-shadow: none;
-  overflow: hidden;
-}
-
-/* 🔥 Full Circular Trailblazer Icon */
-.trailblazer-icon {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-}
-
-/* 🔥 Hide any extra text inside the badge */
-.trailblazer-badge span,
-.trailblazer-badge p {
+/* 🔥 Fix Empty Box Issue */
+.admin-user-management td:empty {
   display: none;
 }
 
-/* 🔥 Load More Button styled like the rest of the app and centered */
-.load-more-button {
-  display: block;
-  margin: 10px auto; /* reduced margin */
-  padding: 8px 16px; /* reduced padding */
-  background-color: var(--primary-bg, #f0f0f0);
-  border: none;
-  border-radius: var(--border-radius, 4px);
-  box-shadow: var(--card-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
-  font-size: 16px;
-  color: var(--text-color, #333);
+/* 🔥 Fix Actions Column Width */
+.admin-user-management td:last-child {
+  min-width: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 🔥 Buttons */
+.admin-user-management button {
+  padding: 6px 12px;
+  font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  margin: 3px;
+  display: inline-block;
+  border-radius: 4px;
 }
 
-.load-more-button:hover {
-  background-color: var(--primary-hover, #e0e0e0);
+/* 🔥 Ban Button */
+.ban-button {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
 }
 
-/* 🔥 Reduce top and bottom margins for individual user entries */
-.user-entry {
-  margin-top: 3px;
-  margin-bottom: 3px;
+.ban-button:hover {
+  background-color: #b71c1c;
+}
+
+/* 🔥 Unban Button */
+.unban-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
+
+.unban-button:hover {
+  background-color: #388e3c;
+}
+
+/* 🔥 Badge Section */
+.badge-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 🔥 Badge Image */
+.badge-image {
+  width: 40px;
+  height: 40px;
+}
+
+/* 🔥 Add Badge Button */
+.award-badge-button {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+}
+
+.award-badge-button:hover {
+  background-color: #e68900;
+}
+
+/* 🔥 Table Row Hover */
+.admin-user-management tr:hover {
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+/* 🔥 Responsive Table */
+@media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 10px;
+  }
+
+  .admin-user-management table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .admin-user-management th,
+  .admin-user-management td {
+    font-size: 14px;
+    padding: 5px;
+  }
+
+  .admin-user-management td:last-child {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* 🔥 Ensure no extra empty space in panels */
+@media (max-width: 600px) {
+  .content {
+    flex-direction: column;
+  }
+
+  .stats-panel,
+  .entries-panel {
+    width: 100%;
+  }
 }

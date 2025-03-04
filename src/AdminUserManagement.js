@@ -7,6 +7,7 @@ const AdminUserManagement = () => {
 
   const USERS_API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/users";
   const TOGGLE_BAN_API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/toggle-ban";
+  const AWARD_BADGE_API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/award-badge";
 
   useEffect(() => {
     fetchUsers();
@@ -42,7 +43,6 @@ const AdminUserManagement = () => {
 
       const updatedUser = await response.json();
 
-      // Update UI
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.email === updatedUser.email ? { ...user, banned: updatedUser.banned } : user
@@ -50,6 +50,27 @@ const AdminUserManagement = () => {
       );
     } catch (err) {
       alert("Error toggling ban: " + err.message);
+    }
+  };
+
+  const handleAwardBadge = async (email) => {
+    const badgeName = prompt("Enter badge name:");
+    if (!badgeName) return;
+
+    try {
+      const response = await fetch(AWARD_BADGE_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, badge: badgeName }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to award badge");
+      }
+
+      alert(`Badge "${badgeName}" awarded to ${email}`);
+    } catch (err) {
+      alert("Error awarding badge: " + err.message);
     }
   };
 
@@ -61,32 +82,39 @@ const AdminUserManagement = () => {
       ) : error ? (
         <p>{error}</p>
       ) : (
-        <table border="1" cellPadding="8" cellSpacing="0">
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Engagement</th>
-              <th>Banned</th>
-              <th>XP</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.email}>
-                <td>{user.email}</td>
-                <td>{user.engagement}</td>
-                <td>{user.banned ? "Yes" : "No"}</td>
-                <td>{user.xp}</td>
-                <td>
-                  <button onClick={() => handleToggleBan(user.email)}>
-                    {user.banned ? "Unban" : "Ban"}
-                  </button>
-                </td>
+        <div className="user-table-container"> {/* Ensures table is scrollable */}
+          <table>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Engagement</th>
+                <th>Banned</th>
+                <th>XP</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.email}>
+                  <td>{user.email}</td>
+                  <td>{user.engagement}</td>
+                  <td>{user.banned ? "Yes" : "No"}</td>
+                  <td>{user.xp}</td>
+                  <td>
+                    <div className="button-group">
+                      <button onClick={() => handleToggleBan(user.email)}>
+                        {user.banned ? "Unban" : "Ban"}
+                      </button>
+                      <button onClick={() => handleAwardBadge(user.email)}>
+                        Award Badge
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
