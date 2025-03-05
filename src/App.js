@@ -10,15 +10,17 @@ import TrailblazerBadge from "./TrailblazerBadge";
 import Leaderboard from "./Leaderboard";
 import AdminDashboard from "./AdminDashboard";
 import DateEntryForm from "./DateEntryForm";
-import UserComments from "./UserComments"; // NEW: Displays user comments
-import AuthContainer from "./AuthContainer"; // Our custom auth component
-import Comms from "./Comms"; // New Comms component
+import UserComments from "./UserComments"; // Displays user comments
+import AuthContainer from "./AuthContainer"; // Custom auth component
+import Comms from "./Comms"; // Existing Comms component
+import Achievements from "./Achievements"; // New Achievements component
 import "./App.css";
 
 const STRAIN_API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
 
 const App = () => {
   const [userId, setUserId] = useState(null);
+  const [level, setLevel] = useState(null); // User's level from profile.
   const [isTrailblazer, setIsTrailblazer] = useState(false);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,20 +29,24 @@ const App = () => {
   const [refreshComments, setRefreshComments] = useState(false);
   const [view, setView] = useState("home");
 
-  // Function to update user state using Amplify Auth.
+  // Update user state using Amplify Auth.
   const updateUserState = async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
       setUserId(user.attributes.email);
       setIsTrailblazer(user.attributes["custom:isTrailblazer"] === "true");
+      // Try to get the level from either "custom:level" or "level"
+      const userLevel = user.attributes["custom:level"] || user.attributes["level"];
+      setLevel(userLevel);
       return true;
     } catch (error) {
       setUserId(null);
+      setLevel(null);
       return false;
     }
   };
 
-  // On mount, check if a user is already authenticated.
+  // On mount, check if a user is authenticated.
   useEffect(() => {
     (async () => {
       const authenticated = await updateUserState();
@@ -61,6 +67,7 @@ const App = () => {
       }
       if (payload.event === "signOut") {
         setUserId(null);
+        setLevel(null);
         setView("home");
       }
     };
@@ -69,7 +76,7 @@ const App = () => {
     return () => Hub.remove("auth", listener);
   }, []);
 
-  // Listen for URL hash changes to determine view.
+  // Listen for URL hash changes.
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
@@ -85,12 +92,15 @@ const App = () => {
         setView("comms");
       } else if (hash === "#merch") {
         setView("merch");
+      } else if (hash === "#achievements") {
+        setView("achievements");
       } else {
         setView(userId ? "dashboard" : "home");
       }
     };
 
     window.addEventListener("hashchange", handleHashChange);
+    // Trigger on mount.
     handleHashChange();
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [userId]);
@@ -143,8 +153,8 @@ const App = () => {
             <h1>Join Club Redstone</h1>
             <p>
               1. No backlogging. If you forget to log a smoke session, move on and get better.
-              2. Rank up.
             </p>
+            <p>Rank up.</p>
             <p>Please sign in or sign up to play.</p>
           </div>
         );
@@ -170,6 +180,8 @@ const App = () => {
             <p>Coming Soon</p>
           </div>
         );
+      case "achievements":
+        return <Achievements entries={entries} level={level} userId={userId} />;
       case "dashboard":
         return (
           <div className="main-content">
@@ -187,7 +199,10 @@ const App = () => {
               <h3>Badges</h3>
               <TrailblazerBadge isTrailblazer={isTrailblazer} />
             </div>
-            <DateEntryForm userId={userId} onCommentSubmitted={handleCommentSubmitted} />
+            <DateEntryForm
+              userId={userId}
+              onCommentSubmitted={handleCommentSubmitted}
+            />
             <UserComments userId={userId} refresh={refreshComments} />
             <div className="content">
               <div className="stats-panel">

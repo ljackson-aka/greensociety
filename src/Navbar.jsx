@@ -22,19 +22,19 @@ const Navbar = ({ userId }) => {
     };
 
     fetchUser();
-  }, [userId]); // update whenever userId changes
+  }, [userId]);
 
   const handleSignOut = async () => {
     try {
       await Auth.signOut();
-      window.location.hash = "#home"; // redirect to home after sign out
+      window.location.hash = "#home";
     } catch (error) {
       console.error("Error signing out:", error);
     }
   };
 
   const handleSignIn = () => {
-    window.location.hash = "#signin"; // go to sign in view
+    window.location.hash = "#signin";
   };
 
   return (
@@ -61,6 +61,9 @@ const Navbar = ({ userId }) => {
               <a href="#profile" className="profile-link">
                 Profile ({displayName})
               </a>
+            </li>
+            <li>
+              <a href="#achievements">Share Achievements</a>
             </li>
             <li>
               <a href="#merch">Merch</a>
