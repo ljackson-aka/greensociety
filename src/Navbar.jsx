@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "./Navbar.css";
 import { Auth } from "aws-amplify";
 
-const Navbar = () => {
+const Navbar = ({ userId }) => {
   const [displayName, setDisplayName] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -13,24 +13,21 @@ const Navbar = () => {
         const user = await Auth.currentAuthenticatedUser();
         const name = user.attributes?.preferred_username || user.attributes?.email;
         setDisplayName(name);
-        // Check if the user belongs to the Admin group.
         const groups = user.signInUserSession.accessToken.payload["cognito:groups"] || [];
         setIsAdmin(groups.includes("Admin"));
       } catch (error) {
-        // No user logged in
         setDisplayName(null);
         setIsAdmin(false);
       }
     };
 
     fetchUser();
-  }, []);
+  }, [userId]); // update whenever userId changes
 
   const handleSignOut = async () => {
     try {
       await Auth.signOut();
       window.location.hash = "#home"; // redirect to home after sign out
-      window.location.reload(); // force a full reload to clear user state
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -44,18 +41,15 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-brand">Club Redstone</div>
       <ul className="navbar-links">
-        {/* Home link is always accessible */}
         <li>
           <a href="#home">Home</a>
         </li>
-        {/* New Comms tab added right after Home */}
         <li>
           <a href="#comms">Comms</a>
         </li>
         <li>
           <a href="#leaderboard">Leaderboard</a>
         </li>
-        {/* Admin link visible only to admin users */}
         {isAdmin && (
           <li>
             <a href="#admin">Admin</a>
@@ -68,7 +62,6 @@ const Navbar = () => {
                 Profile ({displayName})
               </a>
             </li>
-            {/* New Merch tab between profile and sign out */}
             <li>
               <a href="#merch">Merch</a>
             </li>
