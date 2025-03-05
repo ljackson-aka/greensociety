@@ -12,6 +12,7 @@ import AdminDashboard from "./AdminDashboard";
 import DateEntryForm from "./DateEntryForm";
 import UserComments from "./UserComments"; // NEW: Displays user comments
 import AuthContainer from "./AuthContainer"; // Our custom auth component
+import Comms from "./Comms"; // New Comms component
 import "./App.css";
 
 const STRAIN_API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
@@ -90,7 +91,6 @@ const App = () => {
     };
 
     window.addEventListener("hashchange", handleHashChange);
-    // Trigger it once on mount.
     handleHashChange();
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [userId]);
@@ -134,7 +134,7 @@ const App = () => {
 
   const previousStrains = [...new Set(entries.map((entry) => entry.strain_name))];
 
-  // Render main content based on the current view.
+  // Render main content based on view.
   const renderContent = () => {
     switch (view) {
       case "home":
@@ -162,12 +162,7 @@ const App = () => {
       case "admin":
         return <AdminDashboard />;
       case "comms":
-        return (
-          <div className="comms-page">
-            <h1>Comms Page</h1>
-            <p>Welcome to the communications page. More features coming soon!</p>
-          </div>
-        );
+        return <Comms />;
       case "merch":
         return (
           <div className="merch-page">
@@ -217,7 +212,6 @@ const App = () => {
 
   return (
     <div className="app-container">
-      {/* Pass userId to Navbar so it updates automatically */}
       <Navbar userId={userId} />
       {renderContent()}
     </div>
