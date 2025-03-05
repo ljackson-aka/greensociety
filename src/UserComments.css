@@ -1,0 +1,74 @@
+/* UserComments.css */
+.user-comments {
+    width: 100%;
+    background-color: #222; /* dark background to match .date-entry-form */
+    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    color: #ffffff; /* white text */
+  }
+  
+  .user-comments h3 {
+    margin-bottom: 10px;
+  }
+  
+  .user-comments ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .user-comments li {
+    padding: 10px;
+    border-bottom: 1px solid #444; /* similar to textarea border */
+  }
+  
+  .user-comments li:last-child {
+    border-bottom: none;
+  }
+  
+  .user-comments .error {
+    color: red;
+  }
+  
+  /* Load More Button Container */
+  .load-more-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+  }
+  
+  /* Load More Button Styling */
+  .load-more-button {
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #ff4444;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .load-more-button:hover {
+    background-color: #cc3636;
+  }
+  
+  /* Mobile Styles */
+  @media (max-width: 600px) {
+    .user-comments {
+      padding: 10px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .user-comments li {
+      padding: 8px;
+    }
+    
+    .load-more-button {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+    }
+  }
+  

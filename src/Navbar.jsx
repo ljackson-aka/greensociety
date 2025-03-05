@@ -48,6 +48,10 @@ const Navbar = () => {
         <li>
           <a href="#home">Home</a>
         </li>
+        {/* New Comms tab added right after Home */}
+        <li>
+          <a href="#comms">Comms</a>
+        </li>
         <li>
           <a href="#leaderboard">Leaderboard</a>
         </li>
@@ -63,6 +67,10 @@ const Navbar = () => {
               <a href="#profile" className="profile-link">
                 Profile ({displayName})
               </a>
+            </li>
+            {/* New Merch tab between profile and sign out */}
+            <li>
+              <a href="#merch">Merch</a>
             </li>
             <li>
               <button className="signout-btn" onClick={handleSignOut}>

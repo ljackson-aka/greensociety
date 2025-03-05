@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "./Navbar";
 import StrainForm from "./StrainForm";
@@ -8,11 +7,14 @@ import XPProgressBar from "./XPProgressBar";
 import TrailblazerBadge from "./TrailblazerBadge";
 import Leaderboard from "./Leaderboard";
 import SignIn from "./SignIn";
-import AdminDashboard from "./AdminDashboard"; // new import
+import AdminDashboard from "./AdminDashboard";
+import DateEntryForm from "./DateEntryForm";
+import UserComments from "./UserComments"; // NEW: Displays user comments
 import "./App.css";
 import { Auth } from "aws-amplify";
 
-const API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
+const STRAIN_API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
+
 
 const App = () => {
   const [userId, setUserId] = useState(null);
@@ -20,11 +22,11 @@ const App = () => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [refresh, setRefresh] = useState(false);
-  // View can be: "home", "signin", "dashboard", "leaderboard", or "admin"
+  const [refreshEntries, setRefreshEntries] = useState(false);
+  const [refreshComments, setRefreshComments] = useState(false);
   const [view, setView] = useState("home");
 
-  // Check for an authenticated user and set trailblazer status from Cognito custom attribute
+  // Authenticate user and fetch their Cognito attributes
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -50,10 +52,11 @@ const App = () => {
         setView("signin");
       } else if (hash === "#admin") {
         setView("admin");
-      } else if (hash === "#home") {
-        setView("home");
+      } else if (hash === "#comms") {
+        setView("comms");
+      } else if (hash === "#merch") {
+        setView("merch");
       } else {
-        // Default view: if signed in, show dashboard; otherwise, home.
         setView(userId ? "dashboard" : "home");
       }
     };
@@ -62,12 +65,12 @@ const App = () => {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [userId]);
 
-  // Fetch entries if a user is signed in
+  // Fetch user's strain entries
   const fetchEntries = useCallback(async () => {
     if (!userId) return;
     setLoading(true);
     try {
-      const requestUrl = `${API_URL}?user_id=${encodeURIComponent(userId)}&t=${Date.now()}`;
+      const requestUrl = `${STRAIN_API_URL}?user_id=${encodeURIComponent(userId)}&t=${Date.now()}`;
       const response = await fetch(requestUrl);
       if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
       let rawData = await response.json();
@@ -89,14 +92,19 @@ const App = () => {
     if (userId) {
       fetchEntries();
     }
-  }, [userId, refresh, fetchEntries]);
+  }, [userId, refreshEntries, fetchEntries]);
 
   const handleEntryLogged = () => {
-    setRefresh(prev => !prev);
+    setRefreshEntries((prev) => !prev);
   };
 
-  const previousStrains = [...new Set(entries.map(entry => entry.strain_name))];
+  const handleCommentSubmitted = () => {
+    setRefreshComments((prev) => !prev);
+  };
 
+  const previousStrains = [...new Set(entries.map((entry) => entry.strain_name))];
+
+  // Render the main content based on the current view
   const renderContent = () => {
     if (view === "home") {
       return (
@@ -122,6 +130,20 @@ const App = () => {
       return <Leaderboard />;
     } else if (view === "admin") {
       return <AdminDashboard />;
+    } else if (view === "comms") {
+      return (
+        <div className="comms-page">
+          <h1>Comms Page</h1>
+          <p>Welcome to the communications page. More features coming soon!</p>
+        </div>
+      );
+    } else if (view === "merch") {
+      return (
+        <div className="merch-page">
+          <h1>Merch</h1>
+          <p>Coming Soon</p>
+        </div>
+      );
     } else if (view === "dashboard") {
       return (
         <div className="main-content">
@@ -133,12 +155,15 @@ const App = () => {
             />
           </div>
           <div className="xp-container">
-            <XPProgressBar userId={userId} triggerUpdate={refresh} />
+            <XPProgressBar userId={userId} triggerUpdate={refreshEntries} />
           </div>
           <div className="badges-box">
             <h3>Badges</h3>
             <TrailblazerBadge isTrailblazer={isTrailblazer} />
           </div>
+          {/* NEW: Date Entry Form and User Comments Section */}
+          <DateEntryForm userId={userId} onCommentSubmitted={handleCommentSubmitted} />
+          <UserComments userId={userId} refresh={refreshComments} />
           <div className="content">
             <div className="stats-panel">
               <StrainStats entries={entries} />
