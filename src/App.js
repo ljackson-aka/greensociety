@@ -34,7 +34,7 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refreshEntries, setRefreshEntries] = useState(false);
-  const [refreshComments, setRefreshComments] = useState(false);
+  // Removed refreshComments and setRefreshComments to avoid unused-variable warning.
   // view controls which page to show
   const [view, setView] = useState("home");
   // sharedUserId holds the UID from the URL or updated state when viewing achievements.
@@ -189,11 +189,7 @@ const App = () => {
             <h2 style={{ textAlign: "center" }}>Demo: Log a Session</h2>
             <StrainForm
               onEntryLogged={() => setDemoXPTrigger((prev) => prev + 1)}
-              previousStrains={[
-                "Blue Dream",
-                "OG Kush",
-                "Girl Scout Cookies",
-              ]}
+              previousStrains={["Blue Dream", "OG Kush", "Girl Scout Cookies"]}
             />
             {/* Demo XP bar that updates only on log entry */}
             <XPProgressBar demo={true} triggerUpdate={demoXPTrigger} />
@@ -263,11 +259,8 @@ const App = () => {
               <h3>Badges</h3>
               <TrailblazerBadge isTrailblazer={isTrailblazer} />
             </div>
-            <DateEntryForm
-              userId={userId}
-              onCommentSubmitted={handleEntryLogged}
-            />
-            <UserComments userId={userId} refresh={refreshComments} />
+            <DateEntryForm userId={userId} onCommentSubmitted={handleEntryLogged} />
+            <UserComments userId={userId} refresh={refreshEntries} />
             <div className="content">
               <div className="stats-panel">
                 <StrainStats entries={entries} />
