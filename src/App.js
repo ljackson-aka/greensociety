@@ -34,7 +34,6 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refreshEntries, setRefreshEntries] = useState(false);
-  // Removed refreshComments and setRefreshComments to avoid unused-variable warning.
   // view controls which page to show
   const [view, setView] = useState("home");
   // sharedUserId holds the UID from the URL or updated state when viewing achievements.
@@ -191,21 +190,19 @@ const App = () => {
               onEntryLogged={() => setDemoXPTrigger((prev) => prev + 1)}
               previousStrains={["Blue Dream", "OG Kush", "Girl Scout Cookies"]}
             />
-            {/* Demo XP bar that updates only on log entry */}
             <XPProgressBar demo={true} triggerUpdate={demoXPTrigger} />
-            {/* Screenshots section without a header */}
             <div className="screenshots">
               <div className="screenshot-item">
-                <img src={demo1} alt="Demo Screenshot 1" />
                 <p className="caption">1. Add a Session.</p>
+                <img src={demo1} alt="Demo Screenshot 1" />
               </div>
               <div className="screenshot-item">
-                <img src={demo2} alt="Demo Screenshot 2" />
                 <p className="caption">2. Track stats and tendencies.</p>
+                <img src={demo2} alt="Demo Screenshot 2" />
               </div>
               <div className="screenshot-item">
-                <img src={demo3} alt="Demo Screenshot 3" />
                 <p className="caption">3. See history.</p>
+                <img src={demo3} alt="Demo Screenshot 3" />
               </div>
             </div>
           </div>
@@ -259,7 +256,10 @@ const App = () => {
               <h3>Badges</h3>
               <TrailblazerBadge isTrailblazer={isTrailblazer} />
             </div>
-            <DateEntryForm userId={userId} onCommentSubmitted={handleEntryLogged} />
+            <DateEntryForm
+              userId={userId}
+              onCommentSubmitted={handleEntryLogged}
+            />
             <UserComments userId={userId} refresh={refreshEntries} />
             <div className="content">
               <div className="stats-panel">
