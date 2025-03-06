@@ -17,8 +17,13 @@ const UserEntries = ({ entries }) => {
   // Format timestamp for better readability.
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return "Unknown Date";
-    // Convert timestamp (assumed to be in milliseconds) to a number before creating a Date.
-    const date = new Date(Number(timestamp));
+    // Convert timestamp string to a number.
+    let tsNum = Number(timestamp);
+    // If the timestamp has 10 digits, assume it's in seconds, so convert to milliseconds.
+    if (timestamp.length === 10) {
+      tsNum *= 1000;
+    }
+    const date = new Date(tsNum);
     if (isNaN(date.getTime())) return "Invalid Date";
     return date.toLocaleString("en-US", {
       month: "2-digit",
@@ -30,15 +35,22 @@ const UserEntries = ({ entries }) => {
     });
   };
 
-  // Sort entries by timestamp (latest first), filtering out invalid dates.
+  // Sort entries by timestamp (latest first), converting timestamps to numbers.
   const sortedEntries = [...entries]
     .filter(
       (entry) =>
-        entry.timestamp && !isNaN(new Date(Number(entry.timestamp)).getTime())
+        entry.timestamp &&
+        !isNaN(new Date(
+          entry.timestamp.length === 10 ? Number(entry.timestamp) * 1000 : Number(entry.timestamp)
+        ).getTime())
     )
-    .sort((a, b) => new Date(Number(b.timestamp)) - new Date(Number(a.timestamp)));
+    .sort((a, b) => {
+      const aTime = a.timestamp.length === 10 ? Number(a.timestamp) * 1000 : Number(a.timestamp);
+      const bTime = b.timestamp.length === 10 ? Number(b.timestamp) * 1000 : Number(b.timestamp);
+      return bTime - aTime;
+    });
 
-  // Only show the first "visibleCount" entries (newest first).
+  // Only show the first "visibleCount" entries.
   const visibleEntries = sortedEntries.slice(0, visibleCount);
 
   return (
@@ -65,7 +77,6 @@ const UserEntries = ({ entries }) => {
           </div>
         ))}
       </div>
-      {/* Show "Load More" button if there are more entries */}
       {visibleCount < sortedEntries.length && (
         <button
           className="load-more-button"
