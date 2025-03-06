@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "./Navbar.css";
 import { Auth } from "aws-amplify";
 
-const Navbar = ({ userId }) => {
+const Navbar = ({ userId, userSub }) => {
   const [displayName, setDisplayName] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -37,6 +37,9 @@ const Navbar = ({ userId }) => {
     window.location.hash = "#signin";
   };
 
+  // Construct share URL using unique userSub.
+  const shareAchievementsUrl = userSub ? `#achievements?uid=${encodeURIComponent(userSub)}` : "#achievements";
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">Club Redstone</div>
@@ -63,7 +66,7 @@ const Navbar = ({ userId }) => {
               </a>
             </li>
             <li>
-              <a href="#achievements">Share Achievements</a>
+              <a href={shareAchievementsUrl}>Share Achievements</a>
             </li>
             <li>
               <a href="#merch">Merch</a>

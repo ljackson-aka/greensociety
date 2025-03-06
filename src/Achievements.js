@@ -4,10 +4,14 @@ import TrailblazerBadge from "./TrailblazerBadge";
 import "./Achievements.css";
 
 const Achievements = ({ entries, level, userId }) => {
-  // Debug log to check level value (if needed)
+  // Debug logging.
   useEffect(() => {
     console.log("Achievements level prop:", level);
   }, [level]);
+
+  useEffect(() => {
+    console.log("Achievements entries:", entries);
+  }, [entries]);
 
   // Get the most recent session entry (assumes entries are in chronological order).
   const recentEntry = entries && entries.length ? entries[entries.length - 1] : null;
@@ -34,7 +38,7 @@ const Achievements = ({ entries, level, userId }) => {
 
   return (
     <div className="achievements-container">
-      <h1>Share Your Achievements</h1>
+      <h1>Your Achievements</h1>
 
       {recentEntry ? (
         <div className="recent-session">
@@ -53,7 +57,7 @@ const Achievements = ({ entries, level, userId }) => {
       )}
 
       <div className="badges">
-        <h2>Badges</h2>
+        <h2>Your Badges</h2>
         <TrailblazerBadge isTrailblazer={true} />
       </div>
 

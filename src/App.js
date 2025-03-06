@@ -10,43 +10,53 @@ import TrailblazerBadge from "./TrailblazerBadge";
 import Leaderboard from "./Leaderboard";
 import AdminDashboard from "./AdminDashboard";
 import DateEntryForm from "./DateEntryForm";
-import UserComments from "./UserComments"; // Displays user comments
-import AuthContainer from "./AuthContainer"; // Custom auth component
-import Comms from "./Comms"; // Existing Comms component
-import Achievements from "./Achievements"; // New Achievements component
+import UserComments from "./UserComments";
+import AuthContainer from "./AuthContainer";
+import Comms from "./Comms";
+import Achievements from "./Achievements";
 import "./App.css";
 
-const STRAIN_API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
+const STRAIN_API_URL =
+  "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
 
 const App = () => {
+  // Dashboard (private) uses email...
   const [userId, setUserId] = useState(null);
-  const [level, setLevel] = useState(null); // User's level from profile.
+  // Achievements (public) uses the Cognito sub.
+  const [userSub, setUserSub] = useState(null);
+  const [level, setLevel] = useState(null);
   const [isTrailblazer, setIsTrailblazer] = useState(false);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refreshEntries, setRefreshEntries] = useState(false);
   const [refreshComments, setRefreshComments] = useState(false);
+  // view controls which page to show
   const [view, setView] = useState("home");
+  // sharedUserId holds the UID from the URL or updated state when viewing achievements.
+  const [sharedUserId, setSharedUserId] = useState(null);
 
-  // Update user state using Amplify Auth.
+  // updateUserState now returns new state values.
   const updateUserState = async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
-      setUserId(user.attributes.email);
+      const newUserId = user.attributes.email;
+      const newUserSub = user.attributes.sub;
+      const newLevel = user.attributes["custom:level"] || user.attributes["level"];
+      setUserId(newUserId);
+      setUserSub(newUserSub);
       setIsTrailblazer(user.attributes["custom:isTrailblazer"] === "true");
-      // Try to get the level from either "custom:level" or "level"
-      const userLevel = user.attributes["custom:level"] || user.attributes["level"];
-      setLevel(userLevel);
-      return true;
+      setLevel(newLevel);
+      return { userId: newUserId, userSub: newUserSub, level: newLevel };
     } catch (error) {
       setUserId(null);
+      setUserSub(null);
       setLevel(null);
-      return false;
+      return null;
     }
   };
 
-  // On mount, check if a user is authenticated.
+  // On mount, check auth.
   useEffect(() => {
     (async () => {
       const authenticated = await updateUserState();
@@ -54,33 +64,41 @@ const App = () => {
     })();
   }, []);
 
-  // Listen for auth events via Hub.
+  // Listen for auth events.
   useEffect(() => {
     const listener = (data) => {
       const { payload } = data;
       if (payload.event === "signIn" || payload.event === "signUp") {
-        updateUserState().then((authenticated) => {
-          if (authenticated) {
-            setView("dashboard");
-          }
+        updateUserState().then((newState) => {
+          if (newState) setView("dashboard");
         });
       }
       if (payload.event === "signOut") {
         setUserId(null);
+        setUserSub(null);
         setLevel(null);
         setView("home");
       }
     };
-
     Hub.listen("auth", listener);
     return () => Hub.remove("auth", listener);
   }, []);
 
-  // Listen for URL hash changes.
+  // Hash change handler: when hash changes, update view.
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash === "#leaderboard") {
+      if (hash.startsWith("#achievements")) {
+        // Re-fetch user state immediately when entering achievements.
+        updateUserState().then((newState) => {
+          if (newState && newState.userSub) {
+            const newHash = `#achievements?uid=${encodeURIComponent(newState.userSub)}`;
+            window.history.replaceState(null, "", newHash);
+            setSharedUserId(newState.userSub);
+          }
+          setView("achievements");
+        });
+      } else if (hash === "#leaderboard") {
         setView("leaderboard");
       } else if (hash === "#profile") {
         setView("dashboard");
@@ -92,8 +110,6 @@ const App = () => {
         setView("comms");
       } else if (hash === "#merch") {
         setView("merch");
-      } else if (hash === "#achievements") {
-        setView("achievements");
       } else {
         setView(userId ? "dashboard" : "home");
       }
@@ -105,12 +121,18 @@ const App = () => {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [userId]);
 
-  // Fetch user's strain entries.
+  // fetchEntries uses email for dashboard; UID (sharedUserId or userSub) for achievements.
   const fetchEntries = useCallback(async () => {
-    if (!userId) return;
+    let uidToUse;
+    if (view === "dashboard") {
+      uidToUse = userId;
+    } else if (view === "achievements") {
+      uidToUse = sharedUserId || userSub;
+    }
+    if (!uidToUse) return;
     setLoading(true);
     try {
-      const requestUrl = `${STRAIN_API_URL}?user_id=${encodeURIComponent(userId)}&t=${Date.now()}`;
+      const requestUrl = `${STRAIN_API_URL}?user_id=${encodeURIComponent(uidToUse)}&t=${Date.now()}`;
       const response = await fetch(requestUrl);
       if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
       let rawData = await response.json();
@@ -126,34 +148,28 @@ const App = () => {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [view, userId, sharedUserId, userSub]);
 
   useEffect(() => {
-    if (userId) {
+    if (
+      (view === "dashboard" && userId) ||
+      (view === "achievements" && (sharedUserId || userSub))
+    ) {
       fetchEntries();
     }
-  }, [userId, refreshEntries, fetchEntries]);
+  }, [view, userId, sharedUserId, userSub, refreshEntries, fetchEntries]);
 
-  const handleEntryLogged = () => {
-    setRefreshEntries((prev) => !prev);
-  };
-
-  const handleCommentSubmitted = () => {
-    setRefreshComments((prev) => !prev);
-  };
-
+  const handleEntryLogged = () => setRefreshEntries((prev) => !prev);
+  const handleCommentSubmitted = () => setRefreshComments((prev) => !prev);
   const previousStrains = [...new Set(entries.map((entry) => entry.strain_name))];
 
-  // Render main content based on view.
   const renderContent = () => {
     switch (view) {
       case "home":
         return (
           <div className="landing">
             <h1>Join Club Redstone</h1>
-            <p>
-              1. No backlogging. If you forget to log a smoke session, move on and get better.
-            </p>
+            <p>No backlogging. If you forget to log a smoke session, move on and get better.</p>
             <p>Rank up.</p>
             <p>Please sign in or sign up to play.</p>
           </div>
@@ -181,7 +197,13 @@ const App = () => {
           </div>
         );
       case "achievements":
-        return <Achievements entries={entries} level={level} userId={userId} />;
+        return (
+          <Achievements
+            entries={entries}
+            level={level}
+            userId={sharedUserId || userSub}
+          />
+        );
       case "dashboard":
         return (
           <div className="main-content">
@@ -199,10 +221,7 @@ const App = () => {
               <h3>Badges</h3>
               <TrailblazerBadge isTrailblazer={isTrailblazer} />
             </div>
-            <DateEntryForm
-              userId={userId}
-              onCommentSubmitted={handleCommentSubmitted}
-            />
+            <DateEntryForm userId={userId} onCommentSubmitted={handleCommentSubmitted} />
             <UserComments userId={userId} refresh={refreshComments} />
             <div className="content">
               <div className="stats-panel">
