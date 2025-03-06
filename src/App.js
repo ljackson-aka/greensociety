@@ -15,6 +15,11 @@ import Comms from "./Comms";
 import Achievements from "./Achievements";
 import "./App.css";
 
+// Import demo images from the src folder.
+import demo1 from "./demo1.jpg";
+import demo2 from "./demo2.jpg";
+import demo3 from "./demo3.jpg";
+
 const STRAIN_API_URL =
   "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
 
@@ -35,13 +40,17 @@ const App = () => {
   // sharedUserId holds the UID from the URL or updated state when viewing achievements.
   const [sharedUserId, setSharedUserId] = useState(null);
 
+  // For demo XP bar trigger on the home page.
+  const [demoXPTrigger, setDemoXPTrigger] = useState(0);
+
   // updateUserState now returns new state values.
   const updateUserState = async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
       const newUserId = user.attributes.email;
       const newUserSub = user.attributes.sub;
-      const newLevel = user.attributes["custom:level"] || user.attributes["level"];
+      const newLevel =
+        user.attributes["custom:level"] || user.attributes["level"];
       setUserId(newUserId);
       setUserSub(newUserSub);
       setIsTrailblazer(user.attributes["custom:isTrailblazer"] === "true");
@@ -88,10 +97,11 @@ const App = () => {
     const handleHashChange = () => {
       const hash = window.location.hash;
       if (hash.startsWith("#achievements")) {
-        // Re-fetch user state immediately when entering achievements.
         updateUserState().then((newState) => {
           if (newState && newState.userSub) {
-            const newHash = `#achievements?uid=${encodeURIComponent(newState.userSub)}`;
+            const newHash = `#achievements?uid=${encodeURIComponent(
+              newState.userSub
+            )}`;
             window.history.replaceState(null, "", newHash);
             setSharedUserId(newState.userSub);
           }
@@ -115,9 +125,9 @@ const App = () => {
     };
 
     window.addEventListener("hashchange", handleHashChange);
-    // Trigger on mount.
     handleHashChange();
-    return () => window.removeEventListener("hashchange", handleHashChange);
+    return () =>
+      window.removeEventListener("hashchange", handleHashChange);
   }, [userId]);
 
   // fetchEntries uses email for dashboard; UID (sharedUserId or userSub) for achievements.
@@ -131,11 +141,13 @@ const App = () => {
     if (!uidToUse) return;
     setLoading(true);
     try {
-      // Build the URL with only the user_id parameter.
-      const requestUrl = `${STRAIN_API_URL}?user_id=${encodeURIComponent(uidToUse)}`;
-      console.log("Fetching entries from:", requestUrl); // Debug log.
+      const requestUrl = `${STRAIN_API_URL}?user_id=${encodeURIComponent(
+        uidToUse
+      )}`;
+      console.log("Fetching entries from:", requestUrl);
       const response = await fetch(requestUrl);
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok)
+        throw new Error(`HTTP error! Status: ${response.status}`);
       let rawData = await response.json();
       if (typeof rawData.body === "string") {
         rawData = JSON.parse(rawData.body);
@@ -161,18 +173,45 @@ const App = () => {
   }, [view, userId, sharedUserId, userSub, refreshEntries, fetchEntries]);
 
   const handleEntryLogged = () => setRefreshEntries((prev) => !prev);
-  const handleCommentSubmitted = () => setRefreshComments((prev) => !prev);
-  const previousStrains = [...new Set(entries.map((entry) => entry.strain_name))];
 
   const renderContent = () => {
     switch (view) {
       case "home":
         return (
-          <div className="landing">
+          <div className="landing" style={{ textAlign: "center" }}>
             <h1>Join Club Redstone</h1>
-            <p>No backlogging. If you forget to log a smoke session, move on and get better.</p>
+            <p>
+              Track your cannabis smoking sessions. Earn rank, badges, and rewards.
+            </p>
             <p>Rank up.</p>
             <p>Please sign in or sign up to play.</p>
+            <hr />
+            <h2 style={{ textAlign: "center" }}>Demo: Log a Session</h2>
+            <StrainForm
+              onEntryLogged={() => setDemoXPTrigger((prev) => prev + 1)}
+              previousStrains={[
+                "Blue Dream",
+                "OG Kush",
+                "Girl Scout Cookies",
+              ]}
+            />
+            {/* Demo XP bar that updates only on log entry */}
+            <XPProgressBar demo={true} triggerUpdate={demoXPTrigger} />
+            {/* Screenshots section without a header */}
+            <div className="screenshots">
+              <div className="screenshot-item">
+                <img src={demo1} alt="Demo Screenshot 1" />
+                <p className="caption">1. Add a Session.</p>
+              </div>
+              <div className="screenshot-item">
+                <img src={demo2} alt="Demo Screenshot 2" />
+                <p className="caption">2. Track stats and tendencies.</p>
+              </div>
+              <div className="screenshot-item">
+                <img src={demo3} alt="Demo Screenshot 3" />
+                <p className="caption">3. See history.</p>
+              </div>
+            </div>
           </div>
         );
       case "signin":
@@ -212,7 +251,9 @@ const App = () => {
               <StrainForm
                 userId={userId}
                 onEntryLogged={handleEntryLogged}
-                previousStrains={previousStrains}
+                previousStrains={[
+                  ...new Set(entries.map((entry) => entry.strain_name)),
+                ]}
               />
             </div>
             <div className="xp-container">
@@ -222,7 +263,10 @@ const App = () => {
               <h3>Badges</h3>
               <TrailblazerBadge isTrailblazer={isTrailblazer} />
             </div>
-            <DateEntryForm userId={userId} onCommentSubmitted={handleCommentSubmitted} />
+            <DateEntryForm
+              userId={userId}
+              onCommentSubmitted={handleEntryLogged}
+            />
             <UserComments userId={userId} refresh={refreshComments} />
             <div className="content">
               <div className="stats-panel">

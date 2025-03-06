@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { updateUserXP } from "./xpService";
 
-const XPProgressBar = ({ userId, triggerUpdate }) => {
+const XPProgressBar = ({ userId, triggerUpdate, demo }) => {
   const [xpData, setXpData] = useState(null);
   const [loading, setLoading] = useState(true);
-  // This state controls the CSS width of the progress bar.
+  // Controls the CSS width of the progress bar.
   const [progressWidth, setProgressWidth] = useState("0%");
   // States for animating the displayed XP numbers.
   const [displayXP, setDisplayXP] = useState(0);
@@ -19,52 +19,75 @@ const XPProgressBar = ({ userId, triggerUpdate }) => {
   const prevRelativeXPRef = useRef(0);
   const prevLevelRef = useRef(0);
 
-  // Fetch XP data from API.
+  // For demo mode, set initial dummy XP data on mount.
   useEffect(() => {
-    async function fetchXP() {
-      try {
-        setLoading(true);
-        const data = await updateUserXP(userId);
-        console.log("XP data fetched:", data);
-        setXpData(data);
-      } catch (error) {
-        console.error("Failed to fetch XP data:", error);
-      } finally {
-        setLoading(false);
-      }
+    if (demo && !xpData) {
+      setXpData({ level: 1, total_xp: 0, next_level_xp: 100 });
+      setLoading(false);
     }
-    if (userId) {
+  }, [demo, xpData]);
+
+  // For demo mode, update XP data only when triggerUpdate changes.
+  useEffect(() => {
+    if (demo && xpData) {
+      setXpData((prevData) => {
+        let { level, total_xp, next_level_xp } = prevData;
+        // Increase XP by a random amount between 5 and 14.
+        const increment = Math.floor(Math.random() * 10) + 5;
+        total_xp += increment;
+        if (total_xp >= next_level_xp) {
+          level++;
+          total_xp = 0; // Reset XP for the new level.
+          next_level_xp = 100 + (level - 1) * 50; // Arbitrary scaling.
+        }
+        return { level, total_xp, next_level_xp };
+      });
+    }
+  }, [triggerUpdate, demo]);
+
+  // For real users, fetch XP data from API.
+  useEffect(() => {
+    if (!demo && userId) {
+      async function fetchXP() {
+        try {
+          setLoading(true);
+          const data = await updateUserXP(userId);
+          console.log("XP data fetched:", data);
+          setXpData(data);
+        } catch (error) {
+          console.error("Failed to fetch XP data:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
       fetchXP();
     }
-  }, [userId, triggerUpdate]);
+  }, [userId, triggerUpdate, demo]);
 
   useEffect(() => {
     if (xpData) {
-      // Assume the API returns cumulative XP values.
-      // Calculate the XP threshold for the previous level.
       const newLevel = xpData.level;
-      const cumulativeXP = parseFloat(xpData.total_xp);
-      const nextLevelCumulative = parseFloat(xpData.next_level_xp);
-      // For a cumulative system, calculate the previous level threshold.
-      // (This formula is an example; adjust it to your leveling system.)
-      const prevLevelThreshold = newLevel > 1 ? ((newLevel - 1) ** 2) * 100 : 0;
-      // Calculate the relative XP for the current level.
-      const relativeXP = cumulativeXP - prevLevelThreshold;
-      const levelRequirement = nextLevelCumulative - prevLevelThreshold;
-      // Compute progress as a percentage of the level.
+      let relativeXP, levelRequirement;
+      if (demo) {
+        // In demo mode, xpData.total_xp and xpData.next_level_xp are assumed numbers.
+        relativeXP = Number(xpData.total_xp);
+        levelRequirement = Number(xpData.next_level_xp);
+      } else {
+        // For real users, ensure the values are parsed to numbers.
+        const cumulativeXP = parseFloat(xpData.total_xp);
+        const nextLevelCumulative = parseFloat(xpData.next_level_xp);
+        const prevLevelThreshold = newLevel > 1 ? ((newLevel - 1) ** 2) * 100 : 0;
+        relativeXP = cumulativeXP - prevLevelThreshold;
+        levelRequirement = nextLevelCumulative - prevLevelThreshold;
+      }
       const progressPercentage = (relativeXP / levelRequirement) * 100;
 
       // Determine if a level-up occurred.
       const isLevelUp = newLevel > prevLevelRef.current;
-
       if (isLevelUp) {
-        // When a level-up happens, treat the new level's bar as starting at 0.
         setRankedUp(true);
-        // Force the bar to 0% (for the new level, relative XP resets).
         setProgressWidth("0%");
-        // Reset the number animation start value.
         prevRelativeXPRef.current = 0;
-        // Force reflow and animate to the new progress.
         setTimeout(() => {
           requestAnimationFrame(() => {
             setProgressWidth(`${Math.min(progressPercentage, 100)}%`);
@@ -72,13 +95,12 @@ const XPProgressBar = ({ userId, triggerUpdate }) => {
         }, 100);
         setTimeout(() => setRankedUp(false), 2000);
       } else {
-        // If no level-up, animate smoothly from previous relative XP.
         requestAnimationFrame(() => {
           setProgressWidth(`${Math.min(progressPercentage, 100)}%`);
         });
       }
 
-      // Animate the displayed XP numbers from the previous relative XP to the current.
+      // Animate the displayed XP numbers.
       const startXP = prevRelativeXPRef.current;
       const endXP = relativeXP;
       const startTime = performance.now();
@@ -99,7 +121,6 @@ const XPProgressBar = ({ userId, triggerUpdate }) => {
       // Trigger level glow.
       setAnimateLevel(true);
       setTimeout(() => setAnimateLevel(false), animationDuration);
-      // Update the stored level.
       prevLevelRef.current = newLevel;
     }
   }, [xpData]);
@@ -120,7 +141,7 @@ const XPProgressBar = ({ userId, triggerUpdate }) => {
         <div className="xp-progress" style={{ width: progressWidth }}></div>
       </div>
       <p>
-        {displayXP.toFixed(2)} XP / {displayNextLevelXP.toFixed(2)} XP needed for next level
+        {displayXP.toFixed(2)} XP / {Number(displayNextLevelXP).toFixed(2)} XP needed for next level
       </p>
     </div>
   );

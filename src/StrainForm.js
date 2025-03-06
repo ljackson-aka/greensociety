@@ -1,25 +1,37 @@
 import React, { useState } from "react";
 import "./StrainForm.css";
 
-const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
+const StrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
   const [strainName, setStrainName] = useState("");
   const [strainType, setStrainType] = useState("");
   const [method, setMethod] = useState("");
   const [message, setMessage] = useState("");
 
-  const API_URL = "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
+  const API_URL =
+    "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!strainName || !strainType || !method) {
       setMessage("All fields are required!");
       return;
     }
 
-    // Build the request payload without a timezone offset.
+    // If no userId is passed, assume demo mode.
+    if (!userId) {
+      setMessage("Demo: Entry logged successfully!");
+      setTimeout(() => setMessage(""), 3000);
+      setStrainName("");
+      setStrainType("");
+      setMethod("");
+      if (onEntryLogged) onEntryLogged();
+      return;
+    }
+
+    // Build the request payload.
     const formData = {
-      user_id: userId, // User ID is email (from Cognito)
+      user_id: userId,
       strain_name: strainName,
       strain_type: strainType,
       method: method,
@@ -40,14 +52,13 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
       const data = await response.json();
       console.log("Success:", data);
       setMessage("Entry logged successfully!");
-      
+
       // Reset form fields.
       setStrainName("");
       setStrainType("");
       setMethod("");
 
       if (onEntryLogged) onEntryLogged();
-
     } catch (error) {
       console.error("Error:", error);
       setMessage(`Failed to submit: ${error.message}`);
@@ -61,8 +72,9 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
       <form onSubmit={handleSubmit}>
         <div className="form-grid">
           <div className="form-group">
-            <label>Strain Name:</label>
+            <label htmlFor="strainName">Strain Name:</label>
             <input
+              id="strainName"
               type="text"
               list="strain-options"
               value={strainName}
@@ -77,8 +89,13 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
           </div>
 
           <div className="form-group">
-            <label>Strain Type:</label>
-            <select value={strainType} onChange={(e) => setStrainType(e.target.value)} required>
+            <label htmlFor="strainType">Strain Type:</label>
+            <select
+              id="strainType"
+              value={strainType}
+              onChange={(e) => setStrainType(e.target.value)}
+              required
+            >
               <option value="">Select Type</option>
               <option value="Indica">Indica</option>
               <option value="Sativa">Sativa</option>
@@ -87,8 +104,13 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
           </div>
 
           <div className="form-group">
-            <label>Method:</label>
-            <select value={method} onChange={(e) => setMethod(e.target.value)} required>
+            <label htmlFor="method">Method:</label>
+            <select
+              id="method"
+              value={method}
+              onChange={(e) => setMethod(e.target.value)}
+              required
+            >
               <option value="">Select Method</option>
               <option value="Blunt">Blunt</option>
               <option value="Joint">Joint</option>
@@ -96,7 +118,6 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
             </select>
           </div>
         </div>
-
         <button type="submit">Log Entry</button>
       </form>
     </div>
