@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useEffect, useCallback } from "react";
 import { Hub, Auth } from "aws-amplify";
 import Navbar from "./Navbar";
@@ -132,9 +131,11 @@ const App = () => {
     if (!uidToUse) return;
     setLoading(true);
     try {
-      const requestUrl = `${STRAIN_API_URL}?user_id=${encodeURIComponent(uidToUse)}&t=${Date.now()}`;
+      // Build the URL with only the user_id parameter.
+      const requestUrl = `${STRAIN_API_URL}?user_id=${encodeURIComponent(uidToUse)}`;
+      console.log("Fetching entries from:", requestUrl); // Debug log.
       const response = await fetch(requestUrl);
-      if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       let rawData = await response.json();
       if (typeof rawData.body === "string") {
         rawData = JSON.parse(rawData.body);

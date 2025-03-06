@@ -17,6 +17,7 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
       return;
     }
 
+    // Build the request payload without a timezone offset.
     const formData = {
       user_id: userId, // User ID is email (from Cognito)
       strain_name: strainName,
@@ -25,7 +26,7 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
     };
 
     try {
-      // Send POST request to log strain entry
+      // Send POST request to log strain entry.
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,7 +41,7 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains }) => {
       console.log("Success:", data);
       setMessage("Entry logged successfully!");
       
-      // Reset form fields
+      // Reset form fields.
       setStrainName("");
       setStrainType("");
       setMethod("");

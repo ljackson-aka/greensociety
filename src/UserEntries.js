@@ -17,7 +17,8 @@ const UserEntries = ({ entries }) => {
   // Format timestamp for better readability.
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return "Unknown Date";
-    const date = new Date(timestamp);
+    // Convert timestamp (assumed to be in milliseconds) to a number before creating a Date.
+    const date = new Date(Number(timestamp));
     if (isNaN(date.getTime())) return "Invalid Date";
     return date.toLocaleString("en-US", {
       month: "2-digit",
@@ -33,9 +34,9 @@ const UserEntries = ({ entries }) => {
   const sortedEntries = [...entries]
     .filter(
       (entry) =>
-        entry.timestamp && !isNaN(new Date(entry.timestamp).getTime())
+        entry.timestamp && !isNaN(new Date(Number(entry.timestamp)).getTime())
     )
-    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    .sort((a, b) => new Date(Number(b.timestamp)) - new Date(Number(a.timestamp)));
 
   // Only show the first "visibleCount" entries (newest first).
   const visibleEntries = sortedEntries.slice(0, visibleCount);
