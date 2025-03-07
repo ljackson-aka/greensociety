@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Navbar.css";
 import { Auth } from "aws-amplify";
-import logo from "./logo1.PNG";
+import logo from "./sig.png";
 
 const Navbar = ({ userId, userSub }) => {
   const [displayName, setDisplayName] = useState(null);
