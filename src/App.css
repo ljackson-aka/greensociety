@@ -328,3 +328,31 @@ a:hover {
   font-weight: bold;
   color: #fff;
 }
+
+/* Merch Page Styles */
+.merch-page {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px; /* Adjust as needed */
+}
+
+.merch-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.merch-image {
+  max-width: 90%;
+  height: auto;
+  margin-top: 50px; /* Changed from negative to positive to move the image down */
+}
+
+.merch-text {
+  text-align: center;
+  margin-top: 20px; /* Space between image and text */
+  width: 100%;
+}

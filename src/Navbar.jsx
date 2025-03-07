@@ -1,7 +1,8 @@
-// Navbar.js
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./Navbar.css";
 import { Auth } from "aws-amplify";
+import logo from "./logo1.PNG";
 
 const Navbar = ({ userId, userSub }) => {
   const [displayName, setDisplayName] = useState(null);
@@ -42,7 +43,11 @@ const Navbar = ({ userId, userSub }) => {
 
   return (
     <nav className="navbar">
-      <div className="navbar-brand">Club Redstone</div>
+      <div className="navbar-brand">
+        <Link to="/">
+          <img src={logo} alt="Club Redstone" className="logo" />
+        </Link>
+      </div>
       <ul className="navbar-links">
         <li>
           <a href="#home">Home</a>

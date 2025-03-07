@@ -20,13 +20,14 @@ import demo1 from "./demo1.jpg";
 import demo2 from "./demo2.jpg";
 import demo3 from "./demo3.jpg";
 
+// Import the merch image
+import merchImage from "./merch.png";
+
 const STRAIN_API_URL =
   "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
 
 const App = () => {
-  // Dashboard (private) uses email...
   const [userId, setUserId] = useState(null);
-  // Achievements (public) uses the Cognito sub.
   const [userSub, setUserSub] = useState(null);
   const [level, setLevel] = useState(null);
   const [isTrailblazer, setIsTrailblazer] = useState(false);
@@ -34,15 +35,10 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refreshEntries, setRefreshEntries] = useState(false);
-  // view controls which page to show
   const [view, setView] = useState("home");
-  // sharedUserId holds the UID from the URL or updated state when viewing achievements.
   const [sharedUserId, setSharedUserId] = useState(null);
-
-  // For demo XP bar trigger on the home page.
   const [demoXPTrigger, setDemoXPTrigger] = useState(0);
 
-  // updateUserState now returns new state values.
   const updateUserState = async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
@@ -63,7 +59,6 @@ const App = () => {
     }
   };
 
-  // On mount, check auth.
   useEffect(() => {
     (async () => {
       const authenticated = await updateUserState();
@@ -71,7 +66,6 @@ const App = () => {
     })();
   }, []);
 
-  // Listen for auth events.
   useEffect(() => {
     const listener = (data) => {
       const { payload } = data;
@@ -91,7 +85,6 @@ const App = () => {
     return () => Hub.remove("auth", listener);
   }, []);
 
-  // Hash change handler: when hash changes, update view.
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
@@ -129,7 +122,6 @@ const App = () => {
       window.removeEventListener("hashchange", handleHashChange);
   }, [userId]);
 
-  // fetchEntries uses email for dashboard; UID (sharedUserId or userSub) for achievements.
   const fetchEntries = useCallback(async () => {
     let uidToUse;
     if (view === "dashboard") {
@@ -143,7 +135,6 @@ const App = () => {
       const requestUrl = `${STRAIN_API_URL}?user_id=${encodeURIComponent(
         uidToUse
       )}`;
-      console.log("Fetching entries from:", requestUrl);
       const response = await fetch(requestUrl);
       if (!response.ok)
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -225,8 +216,12 @@ const App = () => {
       case "merch":
         return (
           <div className="merch-page">
-            <h1>Merch</h1>
-            <p>Coming Soon</p>
+            <div className="merch-image-container">
+              <img src={merchImage} alt="Merch" className="merch-image" />
+            </div>
+            <div className="merch-text">
+              <h1>Coming Soon</h1>
+            </div>
           </div>
         );
       case "achievements":
@@ -284,7 +279,7 @@ const App = () => {
 
   return (
     <div className="app-container">
-      <Navbar userId={userId} />
+      <Navbar userId={userId} userSub={userSub} />
       {renderContent()}
     </div>
   );
