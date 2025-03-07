@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import "./Navbar.css";
 import { Auth } from "aws-amplify";
 import logo from "./logo1.PNG";
@@ -39,14 +38,14 @@ const Navbar = ({ userId, userSub }) => {
   };
 
   // Construct share URL using unique userSub.
-  const shareAchievementsUrl = userSub ? `#achievements?uid=${encodeURIComponent(userSub)}` : "#achievements";
+  const shareAchievementsUrl = userSub
+    ? `#achievements?uid=${encodeURIComponent(userSub)}`
+    : "#achievements";
 
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <Link to="/">
-          <img src={logo} alt="Club Redstone" className="logo" />
-        </Link>
+        <img src={logo} alt="Club Redstone" className="logo" />
       </div>
       <ul className="navbar-links">
         <li>
