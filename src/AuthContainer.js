@@ -2,7 +2,10 @@
 import React, { useState } from "react";
 import { Auth } from "aws-amplify";
 import "@aws-amplify/ui-react/styles.css";
-import "./AuthContainer.css"; // Import our custom styles
+import "./AuthContainer.css";
+
+// Temporary flag to enable/disable the confirmation step
+const CONFIRMATION_STEP_ENABLED = false; // Set to true to re-enable confirmation
 
 const AuthContainer = ({ onAuthSuccess }) => {
   // Modes: "signup", "confirm", "signin"
@@ -43,8 +46,13 @@ const AuthContainer = ({ onAuthSuccess }) => {
           preferred_username: preferredUsername, // required by your pool
         },
       });
-      setError("Sign up successful! A confirmation code has been sent to your email.");
-      setMode("confirm");
+      if (CONFIRMATION_STEP_ENABLED) {
+        setError("Sign up successful! A confirmation code has been sent to your email.");
+        setMode("confirm");
+      } else {
+        setError("Sign up successful! Your account has been auto-confirmed. Please sign in.");
+        setMode("signin");
+      }
     } catch (err) {
       setError(err.message || "Error signing up");
     } finally {
@@ -153,7 +161,7 @@ const AuthContainer = ({ onAuthSuccess }) => {
           </p>
         </div>
       )}
-      {mode === "confirm" && (
+      {mode === "confirm" && CONFIRMATION_STEP_ENABLED && (
         <div className="confirm-form">
           <h2>Confirm Sign Up</h2>
           {error && <p className="error-message">{error}</p>}
