@@ -1,3 +1,4 @@
+// App.js
 import React, { useState, useEffect, useCallback } from "react";
 import { Hub, Auth } from "aws-amplify";
 import Navbar from "./Navbar";
@@ -13,6 +14,7 @@ import UserComments from "./UserComments";
 import AuthContainer from "./AuthContainer";
 import Comms from "./Comms";
 import Achievements from "./Achievements";
+import Speak from "./Speak"; // Import the new Speak page
 import "./App.css";
 
 // Import demo images from the src folder.
@@ -111,6 +113,8 @@ const App = () => {
         setView("comms");
       } else if (hash === "#merch") {
         setView("merch");
+      } else if (hash === "#speak") { // New hash for Speak page
+        setView("speak");
       } else {
         setView(userId ? "dashboard" : "home");
       }
@@ -272,6 +276,8 @@ const App = () => {
             </div>
           </div>
         );
+      case "speak": // New case for Speak page
+        return <Speak />;
       default:
         return null;
     }

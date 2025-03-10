@@ -1,6 +1,8 @@
+// src/AdminDashboard.js
 import React, { useState, useEffect } from "react";
 import { Auth } from "aws-amplify";
 import AdminUserManagement from "./AdminUserManagement";
+import TestEmailButton from "./TestEmailButton";
 
 const AdminDashboard = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -39,6 +41,9 @@ const AdminDashboard = () => {
         view top-ranked users and XP trends, and manually award or revoke badges.
       </p>
       <AdminUserManagement />
+      <hr />
+      <h2>Test Mass Email (Dry Run)</h2>
+      <TestEmailButton />
     </div>
   );
 };
