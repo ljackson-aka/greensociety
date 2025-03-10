@@ -5,7 +5,7 @@ import "@aws-amplify/ui-react/styles.css";
 import "./AuthContainer.css";
 
 // Temporary flag to enable/disable the confirmation step
-const CONFIRMATION_STEP_ENABLED = false; // Set to true to re-enable confirmation
+const CONFIRMATION_STEP_ENABLED = true; // Set to true to re-enable confirmation
 
 const AuthContainer = ({ onAuthSuccess }) => {
   // Modes: "signup", "confirm", "signin"
