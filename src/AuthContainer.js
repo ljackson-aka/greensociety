@@ -1,29 +1,19 @@
-// AuthContainer.js
 import React, { useState } from "react";
 import { Auth } from "aws-amplify";
 import "@aws-amplify/ui-react/styles.css";
 import "./AuthContainer.css";
 
-// Temporary flag to enable/disable the confirmation step
-const CONFIRMATION_STEP_ENABLED = true; // Set to true to re-enable confirmation
-
 const AuthContainer = ({ onAuthSuccess }) => {
-  // Modes: "signup", "confirm", "signin"
-  const [mode, setMode] = useState("signup");
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
-  
-  // Common fields
+  const [mode, setMode] = useState("signin"); // Modes: signin, signup, confirm, forgotPassword, resetPassword
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
-  // Sign up fields
   const [confirmPassword, setConfirmPassword] = useState("");
   const [preferredUsername, setPreferredUsername] = useState("");
-  
-  // Confirmation code field
   const [code, setCode] = useState("");
-  
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   // Handle Sign Up
   const handleSignUp = async (e) => {
@@ -32,201 +22,121 @@ const AuthContainer = ({ onAuthSuccess }) => {
       setError("Passwords do not match.");
       return;
     }
-    if (!preferredUsername) {
-      setError("Preferred Username is required.");
-      return;
-    }
-    setIsAuthenticating(true);
     try {
       await Auth.signUp({
-        username: email, // use email as the username
+        username: email,
         password,
-        attributes: {
-          email, // required attribute
-          preferred_username: preferredUsername, // required by your pool
-        },
+        attributes: { email, preferred_username: preferredUsername },
       });
-      if (CONFIRMATION_STEP_ENABLED) {
-        setError("Sign up successful! A confirmation code has been sent to your email.");
-        setMode("confirm");
-      } else {
-        setError("Sign up successful! Your account has been auto-confirmed. Please sign in.");
-        setMode("signin");
-      }
+      setMessage("Sign-up successful! Check your email for the confirmation code.");
+      setMode("confirm");
     } catch (err) {
       setError(err.message || "Error signing up");
-    } finally {
-      setIsAuthenticating(false);
     }
   };
 
-  // Handle confirmation of sign-up with code.
+  // Confirm Sign Up
   const handleConfirmSignUp = async (e) => {
     e.preventDefault();
-    if (!code) {
-      setError("Please enter the confirmation code.");
-      return;
-    }
-    setIsAuthenticating(true);
     try {
       await Auth.confirmSignUp(email, code);
-      setError("Confirmation successful! Please sign in.");
+      setMessage("Confirmation successful! Please sign in.");
       setMode("signin");
     } catch (err) {
       setError(err.message || "Error confirming sign up");
-    } finally {
-      setIsAuthenticating(false);
     }
   };
 
   // Handle Sign In
   const handleSignIn = async (e) => {
     e.preventDefault();
-    setIsAuthenticating(true);
     try {
-      const user = await Auth.signIn(email, password);
-      if (user && user.signInUserSession && user.signInUserSession.accessToken) {
-        onAuthSuccess();
-      } else {
-        setError("Authentication token not available. Ensure your account is confirmed.");
-      }
+      await Auth.signIn(email, password);
+      onAuthSuccess();
     } catch (err) {
       setError(err.message || "Error signing in");
-    } finally {
-      setIsAuthenticating(false);
+    }
+  };
+
+  // Handle Forgot Password Request
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    try {
+      await Auth.forgotPassword(email);
+      setMessage("Verification code sent to your email.");
+      setMode("resetPassword");
+    } catch (err) {
+      setError(err.message || "Error sending verification code");
+    }
+  };
+
+  // Handle Password Reset with Confirmation
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmNewPassword) {
+      setError("New passwords do not match.");
+      return;
+    }
+    try {
+      await Auth.forgotPasswordSubmit(email, code, newPassword);
+      setMessage("Password reset successful! Please sign in with your new password.");
+      setMode("signin");
+    } catch (err) {
+      setError(err.message || "Error resetting password");
     }
   };
 
   return (
     <div className="auth-container">
-      {isAuthenticating && <p className="loading-message">Authenticating, please wait...</p>}
-      {mode === "signup" && (
-        <div className="signup-form">
-          <h2>Sign Up</h2>
-          {error && <p className="error-message">{error}</p>}
-          <form onSubmit={handleSignUp}>
-            <div className="form-field">
-              <label>Email (this will be your username):</label>
-              <input
-                type="email"
-                value={email}
-                placeholder="example@domain.com"
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isAuthenticating}
-              />
-            </div>
-            <div className="form-field">
-              <label>Password:</label>
-              <input
-                type="password"
-                value={password}
-                placeholder="Enter your password"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isAuthenticating}
-              />
-            </div>
-            <div className="form-field">
-              <label>Confirm Password:</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                placeholder="Please confirm your password"
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                disabled={isAuthenticating}
-              />
-            </div>
-            <div className="form-field">
-              <label>Preferred Username:</label>
-              <input
-                type="text"
-                value={preferredUsername}
-                placeholder="Enter your preferred username"
-                onChange={(e) => setPreferredUsername(e.target.value)}
-                required
-                disabled={isAuthenticating}
-              />
-            </div>
-            <button type="submit" disabled={isAuthenticating}>
-              Sign Up
-            </button>
-          </form>
-          <p>
-            Already have an account?{" "}
-            <button className="link" onClick={() => { setMode("signin"); setError(""); }} disabled={isAuthenticating}>
-              Sign In
-            </button>
-          </p>
-        </div>
-      )}
-      {mode === "confirm" && CONFIRMATION_STEP_ENABLED && (
-        <div className="confirm-form">
-          <h2>Confirm Sign Up</h2>
-          {error && <p className="error-message">{error}</p>}
-          <form onSubmit={handleConfirmSignUp}>
-            <div className="form-field">
-              <label>Confirmation Code:</label>
-              <input
-                type="text"
-                value={code}
-                placeholder="Enter confirmation code"
-                onChange={(e) => setCode(e.target.value)}
-                required
-                disabled={isAuthenticating}
-              />
-            </div>
-            <button type="submit" disabled={isAuthenticating}>
-              Confirm
-            </button>
-          </form>
-          <p>
-            Didn't receive a code?{" "}
-            <button className="link" onClick={() => { setMode("signup"); setError(""); }} disabled={isAuthenticating}>
-              Back to Sign Up
-            </button>
-          </p>
-        </div>
-      )}
+      {message && <p className="success-message">{message}</p>}
+      {error && <p className="error-message">{error}</p>}
+
       {mode === "signin" && (
-        <div className="signin-form">
+        <form onSubmit={handleSignIn}>
           <h2>Sign In</h2>
-          {error && <p className="error-message">{error}</p>}
-          <form onSubmit={handleSignIn}>
-            <div className="form-field">
-              <label>Email:</label>
-              <input
-                type="email"
-                value={email}
-                placeholder="example@domain.com"
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isAuthenticating}
-              />
-            </div>
-            <div className="form-field">
-              <label>Password:</label>
-              <input
-                type="password"
-                value={password}
-                placeholder="Enter your password"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isAuthenticating}
-              />
-            </div>
-            <button type="submit" disabled={isAuthenticating}>
-              Sign In
-            </button>
-          </form>
-          <p>
-            Don't have an account?{" "}
-            <button className="link" onClick={() => { setMode("signup"); setError(""); }} disabled={isAuthenticating}>
-              Sign Up
-            </button>
-          </p>
-        </div>
+          <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
+          <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} required />
+          <button type="submit">Sign In</button>
+          <button type="button" onClick={() => setMode("forgotPassword")}>Forgot Password?</button>
+          <button type="button" onClick={() => setMode("signup")}>Sign Up</button>
+        </form>
+      )}
+
+      {mode === "signup" && (
+        <form onSubmit={handleSignUp}>
+          <h2>Sign Up</h2>
+          <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
+          <input type="text" placeholder="Preferred Username" onChange={(e) => setPreferredUsername(e.target.value)} required />
+          <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} required />
+          <input type="password" placeholder="Confirm Password" onChange={(e) => setConfirmPassword(e.target.value)} required />
+          <button type="submit">Sign Up</button>
+        </form>
+      )}
+
+      {mode === "confirm" && (
+        <form onSubmit={handleConfirmSignUp}>
+          <h2>Confirm Sign Up</h2>
+          <input type="text" placeholder="Confirmation Code" onChange={(e) => setCode(e.target.value)} required />
+          <button type="submit">Confirm</button>
+        </form>
+      )}
+
+      {mode === "forgotPassword" && (
+        <form onSubmit={handleForgotPassword}>
+          <h2>Forgot Password</h2>
+          <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
+          <button type="submit">Send Verification Code</button>
+        </form>
+      )}
+
+      {mode === "resetPassword" && (
+        <form onSubmit={handleResetPassword}>
+          <h2>Reset Password</h2>
+          <input type="text" placeholder="Verification Code" onChange={(e) => setCode(e.target.value)} required />
+          <input type="password" placeholder="New Password" onChange={(e) => setNewPassword(e.target.value)} required />
+          <input type="password" placeholder="Confirm New Password" onChange={(e) => setConfirmNewPassword(e.target.value)} required />
+          <button type="submit">Reset Password</button>
+        </form>
       )}
     </div>
   );

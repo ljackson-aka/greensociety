@@ -55,7 +55,6 @@ const Navbar = ({ userId, userSub }) => {
           <a href="#comms">Comms</a>
         </li>
         <li>
-          {/* Changed link text from "Leaderboard" to "A Green Society" */}
           <a href="#leaderboard">A Green Society</a>
         </li>
         {isAdmin && (
@@ -82,14 +81,14 @@ const Navbar = ({ userId, userSub }) => {
               <a href="#merch">Merch</a>
             </li>
             <li>
-              <button className="signout-btn" onClick={handleSignOut}>
+              <button className="nav-button" onClick={handleSignOut}>
                 Sign Out
               </button>
             </li>
           </>
         ) : (
           <li>
-            <button className="signout-btn" onClick={handleSignIn}>
+            <button className="nav-button" onClick={handleSignIn}>
               Sign In
             </button>
           </li>

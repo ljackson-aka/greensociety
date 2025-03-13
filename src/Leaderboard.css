@@ -1,4 +1,3 @@
-/* Leaderboard.css */
 .leaderboard-container {
   max-width: 800px;
   margin: 20px auto;
@@ -10,11 +9,8 @@
 }
 
 .leaderboard-container h2 {
-  font-size: 2.2em; /* Slightly larger header */
+  font-size: 2em;
   margin-bottom: 10px;
-  color: #013220; /* Dark forest green */
-  /* Slightly thicker white outline that remains subtle */
-
 }
 
 .leaderboard-table {
@@ -26,8 +22,14 @@
 .leaderboard-table td {
   padding: 8px;
   border-bottom: 1px solid #ddd;
+  text-align: center;
+  white-space: nowrap;
 }
 
-.leaderboard-table th {
-  font-weight: bold;
+@media (max-width: 600px) {
+  .leaderboard-table th,
+  .leaderboard-table td {
+      padding: 5px;
+      font-size: 12px;
+  }
 }
