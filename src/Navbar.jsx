@@ -1,4 +1,3 @@
-// Navbar.js
 import React, { useState, useEffect } from "react";
 import "./Navbar.css";
 import { Auth } from "aws-amplify";
@@ -56,7 +55,8 @@ const Navbar = ({ userId, userSub }) => {
           <a href="#comms">Comms</a>
         </li>
         <li>
-          <a href="#leaderboard">Leaderboard</a>
+          {/* Changed link text from "Leaderboard" to "A Green Society" */}
+          <a href="#leaderboard">A Green Society</a>
         </li>
         {isAdmin && (
           <>

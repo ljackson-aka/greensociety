@@ -1,4 +1,3 @@
-// App.js
 import React, { useState, useEffect, useCallback } from "react";
 import { Hub, Auth } from "aws-amplify";
 import Navbar from "./Navbar";

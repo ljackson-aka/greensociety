@@ -1,4 +1,3 @@
-// HardcoreStrainForm.js
 import React, { useState } from "react";
 import "./StrainForm.css";
 
@@ -9,7 +8,6 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
   const [weight, setWeight] = useState("");
   const [message, setMessage] = useState("");
 
-  // Endpoints for the two separate lambdas.
   const SESSION_API_URL =
     "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
   const WEIGHT_API_URL =
@@ -18,13 +16,11 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate that all fields are provided.
     if (!strainName || !strainType || !method || !weight) {
       setMessage("All fields are required!");
       return;
     }
 
-    // Demo mode if no userId is provided.
     if (!userId) {
       setMessage("Demo: Entry logged successfully!");
       setTimeout(() => setMessage(""), 3000);
@@ -58,7 +54,6 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
       }
 
       const sessionData = await sessionResponse.json();
-      // Assume the main lambda returns a "timestamp" key to identify the entry.
       const timestamp = sessionData.timestamp;
       if (!timestamp) {
         throw new Error("Timestamp not returned from session logging.");
@@ -84,15 +79,11 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
       }
 
       await weightResponse.json();
-
       setMessage("Entry and weight updated successfully!");
-
-      // Reset the form fields.
       setStrainName("");
       setStrainType("");
       setMethod("");
       setWeight("");
-
       if (onEntryLogged) onEntryLogged();
     } catch (error) {
       console.error("Error:", error);
@@ -106,7 +97,7 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
       {message && <p className="form-message">{message}</p>}
       <form onSubmit={handleSubmit}>
         <div className="form-grid">
-          <div className="form-group name-group">
+          <div className="form-group">
             <label htmlFor="strainName">Strain Name:</label>
             <input
               id="strainName"
@@ -123,7 +114,7 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
             </datalist>
           </div>
 
-          <div className="form-group type-group">
+          <div className="form-group">
             <label htmlFor="strainType">Strain Type:</label>
             <select
               id="strainType"
@@ -138,7 +129,7 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
             </select>
           </div>
 
-          <div className="form-group method-group">
+          <div className="form-group">
             <label htmlFor="method">Method:</label>
             <select
               id="method"
@@ -158,8 +149,16 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
             <input
               id="weight"
               type="number"
+              step="0.01"
+              placeholder="0.00"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
+              onBlur={(e) => {
+                const val = parseFloat(e.target.value);
+                if (!isNaN(val)) {
+                  setWeight(val.toFixed(2));
+                }
+              }}
               required
             />
           </div>

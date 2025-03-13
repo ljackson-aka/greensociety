@@ -1,4 +1,3 @@
-// StrainFormSwitcher.js
 import React, { useState, useEffect } from "react";
 import CasualStrainForm from "./CasualStrainForm";
 import HardcoreStrainForm from "./HardcoreStrainForm";
@@ -60,11 +59,8 @@ const StrainFormSwitcher = ({ userId, onEntryLogged, previousStrains = [] }) => 
 
   return (
     <div className="strain-form-switcher">
-      <div
-        className="form-type-selector"
-        style={{ textAlign: "center", marginBottom: "20px" }}
-      >
-        <label htmlFor="formType">Select Form: </label>
+      <div className="form-type-selector">
+        <label htmlFor="formType">Mode:</label>
         <select id="formType" value={formType} onChange={handleFormTypeChange}>
           <option value="Casual">Casual</option>
           <option value="Hardcore">Hardcore</option>

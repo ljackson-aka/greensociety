@@ -34,7 +34,7 @@ const Leaderboard = () => {
 
   return (
     <div className="leaderboard-container">
-      <h2>Leaderboard</h2>
+      <h2>A Green Society</h2>
       <table className="leaderboard-table">
         <thead>
           <tr>

@@ -4,3 +4,26 @@
     margin: auto;
   }
   
+  .form-type-selector {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-type-selector label {
+    font-size: 1rem;
+    margin-right: 8px;
+    color: var(--text-color); /* Uses your global text color variable */
+  }
+  
+  /* Increased width so that "Hardcore" fits properly */
+  .form-type-selector select {
+    width: 120px;
+    padding: 5px;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: #222;
+    color: var(--text-color);
+    font-size: 1rem;
+    text-align: center;
+  }
+  
