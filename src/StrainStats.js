@@ -61,6 +61,23 @@ const StrainStats = ({ entries }) => {
       total: 0,
     }).strain;
 
+  // Calculate G.P.D: Average weight (in grams) per 24 hours (per day)
+  // Filter entries that have a weight value.
+  const weightEntries = entries.filter(entry => entry.weight);
+  let gpd = "N/A";
+  if (weightEntries.length > 0) {
+    // Sort by timestamp (assuming timestamps are stored as strings in ms)
+    weightEntries.sort((a, b) => Number(a.timestamp) - Number(b.timestamp));
+    // Sum the weight values (convert weight to a number)
+    const totalWeight = weightEntries.reduce((sum, entry) => sum + parseFloat(entry.weight), 0);
+    // Calculate the time span in days
+    const earliest = Number(weightEntries[0].timestamp);
+    const latest = Number(weightEntries[weightEntries.length - 1].timestamp);
+    // Ensure at least one day
+    const days = Math.max((latest - earliest) / 86400000, 1);
+    gpd = (totalWeight / days).toFixed(2);
+  }
+
   return (
     <div className="strain-stats">
       <h2>Statistics</h2>
@@ -78,6 +95,11 @@ const StrainStats = ({ entries }) => {
         <div className="preferred-item">
           <span className="preferred-label">Dominant Strain:</span>
           <span className="preferred-value">{dominantStrain}</span>
+        </div>
+        {/* New G.P.D metric */}
+        <div className="preferred-item">
+          <span className="preferred-label">G.P.D.:</span>
+          <span className="preferred-value">{gpd} g</span>
         </div>
       </div>
 

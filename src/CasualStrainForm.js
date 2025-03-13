@@ -1,7 +1,8 @@
+// CasualStrainForm.js
 import React, { useState } from "react";
 import "./StrainForm.css";
 
-const StrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
+const CasualStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
   const [strainName, setStrainName] = useState("");
   const [strainType, setStrainType] = useState("");
   const [method, setMethod] = useState("");
@@ -67,7 +68,7 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
 
   return (
     <div className="strain-form">
-      <h2>Add Session</h2>
+      <h2>Casual Session</h2>
       {message && <p className="form-message">{message}</p>}
       <form onSubmit={handleSubmit}>
         <div className="form-grid">
@@ -124,4 +125,4 @@ const StrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
   );
 };
 
-export default StrainForm;
+export default CasualStrainForm;

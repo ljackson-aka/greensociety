@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Hub, Auth } from "aws-amplify";
 import Navbar from "./Navbar";
-import StrainForm from "./StrainForm";
+import StrainFormSwitcher from "./StrainFormSwitcher";
 import UserEntries from "./UserEntries";
 import StrainStats from "./StrainStats";
 import XPProgressBar from "./XPProgressBar";
@@ -14,7 +14,7 @@ import UserComments from "./UserComments";
 import AuthContainer from "./AuthContainer";
 import Comms from "./Comms";
 import Achievements from "./Achievements";
-import Speak from "./Speak"; // Import the new Speak page
+import Speak from "./Speak"; // New Speak page
 import "./App.css";
 
 // Import demo images from the src folder.
@@ -113,7 +113,7 @@ const App = () => {
         setView("comms");
       } else if (hash === "#merch") {
         setView("merch");
-      } else if (hash === "#speak") { // New hash for Speak page
+      } else if (hash === "#speak") {
         setView("speak");
       } else {
         setView(userId ? "dashboard" : "home");
@@ -175,15 +175,20 @@ const App = () => {
           <div className="landing" style={{ textAlign: "center" }}>
             <h1>Join Club Redstone</h1>
             <p>
-              Track your cannabis smoking sessions. Earn rank, badges, and rewards.
+              Track your cannabis smoking sessions. Earn rank, badges, and
+              rewards.
             </p>
             <p>Rank up.</p>
             <p>Please sign in or sign up to play.</p>
             <hr />
             <h2 style={{ textAlign: "center" }}>Demo: Log a Session</h2>
-            <StrainForm
+            <StrainFormSwitcher
               onEntryLogged={() => setDemoXPTrigger((prev) => prev + 1)}
-              previousStrains={["Blue Dream", "OG Kush", "Girl Scout Cookies"]}
+              previousStrains={[
+                "Blue Dream",
+                "OG Kush",
+                "Girl Scout Cookies",
+              ]}
             />
             <XPProgressBar demo={true} triggerUpdate={demoXPTrigger} />
             <div className="screenshots">
@@ -240,7 +245,7 @@ const App = () => {
         return (
           <div className="main-content">
             <div className="submission-form">
-              <StrainForm
+              <StrainFormSwitcher
                 userId={userId}
                 onEntryLogged={handleEntryLogged}
                 previousStrains={[
@@ -276,7 +281,7 @@ const App = () => {
             </div>
           </div>
         );
-      case "speak": // New case for Speak page
+      case "speak":
         return <Speak />;
       default:
         return null;

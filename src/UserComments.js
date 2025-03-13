@@ -46,7 +46,7 @@ const UserComments = ({ userId, refresh }) => {
 
   return (
     <div className="user-comments">
-      <h3>Your Comments</h3>
+      <h3>Private Journal:</h3>
       {loading ? (
         <p>Loading...</p>
       ) : error ? (

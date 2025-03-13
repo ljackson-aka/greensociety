@@ -1,84 +1,97 @@
+/* Base styles for the form */
 .strain-form {
-    color: var(--text-color);
-    max-width: 600px;
-    margin: auto;
-    padding: 15px;
-  }
-  
-  .strain-form h2 {
-    margin-top: 0;
-    font-size: 1.5rem;
-    text-align: center;
-  }
-  
-  .form-message {
-    color: var(--accent-red);
-    font-size: 0.95rem;
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  
-  /* Grid Layout for Inputs */
+  color: var(--text-color);
+  max-width: 600px;
+  margin: auto;
+  padding: 15px;
+}
+
+.strain-form h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.form-message {
+  color: var(--accent-red);
+  font-size: 0.95rem;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Default: mobile layout (one column) */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Ensure consistent styling for form groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.strain-form input,
+.strain-form select {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: var(--border-radius);
+  background-color: #222;
+  color: var(--text-color);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.strain-form button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background-color: var(--accent-red);
+  color: var(--text-color);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.strain-form button:hover {
+  background-color: #cc0000;
+}
+
+/* Desktop layout: Grid with 3 columns and 2 rows using named areas */
+@media (min-width: 601px) {
   .form-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "name type method"
+      ". weight .";
     gap: 12px;
     align-items: center;
   }
-  
-  /* Ensure elements align properly */
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  /* Assign grid areas to specific form groups */
+  .name-group {
+    grid-area: name;
   }
-  
-  .form-group label {
-    font-size: 0.9rem;
-    margin-bottom: 5px;
-    text-align: center;
+  .type-group {
+    grid-area: type;
   }
-  
-  /* Input fields and select boxes */
-  .strain-form input,
-  .strain-form select {
-    width: 100%;
-    padding: 8px;
-    border: none;
-    border-radius: var(--border-radius);
-    background-color: #222;
-    color: var(--text-color);
-    font-size: 1rem;
-    text-align: center;
+  .method-group {
+    grid-area: method;
   }
-  
-  /* Button styling */
-  .strain-form button {
-    width: 100%;
-    margin-top: 12px;
-    padding: 10px;
-    background-color: var(--accent-red);
-    color: var(--text-color);
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 1rem;
-    transition: background-color 0.3s;
+  .weight-group {
+    grid-area: weight;
   }
-  
-  .strain-form button:hover {
-    background-color: #cc0000;
-  }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 600px) {
-    .form-grid {
-      grid-template-columns: 1fr;
-    }
-  
-    .form-group {
-      width: 100%;
-    }
-  }
-  
+}
