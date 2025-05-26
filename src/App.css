@@ -541,7 +541,7 @@ a:hover {
   font-size: 3rem;       /* your existing size */
 }
 @media (max-width: 768px) {
-  /* make the fixed panel a bottom bar */
+  /* move from right‑rail into a bottom bar */
   .stripe-fixed-panel {
     position: fixed;
     bottom: 0;
@@ -553,10 +553,10 @@ a:hover {
     padding: 6px 0;
     background: rgba(0, 0, 0, 0.85);
     z-index: 1000;
-    transform: none;
+    transform: none;    /* cancel the translateY on mobile */
   }
 
-  /* force each wrapper (dangerouslySetInnerHTML <div>) to our size */
+  /* shrink each wrapper <div> that holds a stripe-buy-button */
   .stripe-fixed-panel > div {
     flex: 0 0 auto;
     width: 100px !important;
@@ -565,7 +565,7 @@ a:hover {
     margin: 0;
   }
 
-  /* force the stripe-buy-button host to fill its wrapper */
+  /* force the buy‑button to fill its wrapper */
   .stripe-fixed-panel stripe-buy-button {
     display: inline-block;
     width: 100% !important;
