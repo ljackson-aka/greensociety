@@ -134,6 +134,8 @@
   border-right: none;
 }
 
+/* -------------------------------------------------- */
+/* MOBILE FIX: keep 4 columns + horizontal scroll */
 @media (max-width: 768px) {
   .preferred-metrics {
     grid-template-columns: 1fr;
@@ -143,7 +145,14 @@
     grid-template-columns: 1fr;
   }
 
+  /* allow breakdown to scroll sideways */
+  .stats-breakdown {
+    overflow-x: auto;
+  }
+
   .breakdown-grid {
-    grid-template-columns: 1fr 1fr;
+    /* restore 4 columns on mobile */
+    grid-template-columns: 2fr repeat(3, 1fr);
+    width: max-content;
   }
 }
