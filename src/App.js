@@ -20,7 +20,6 @@ import demo1 from "./demo1.jpg";
 import demo2 from "./demo2.jpg";
 import demo3 from "./demo3.jpg";
 import AR6 from "./AR6.png";
-// TMHCRC import removed per request
 
 const STRAIN_API_URL =
   "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
@@ -48,17 +47,14 @@ const App = () => {
     script.src = "https://js.stripe.com/v3/buy-button.js";
     script.async = true;
     script.onload = () => {
-      // give each button an ID so we can target it
       setHoodieHTML(`
         <stripe-buy-button
-          id="stripe-hoodie-btn"
           buy-button-id="buy_btn_1RSb9oJrLBeT2yh0f4hgKoHj"
           publishable-key="pk_live_51LNfK8JrLBeT2yh0M9LkMQzvHpAWiU3sdjmRRm9nWH4nVJ3x8FIglwwOnPgfuoc2F4ZWBZulOJl5FiBillt4cTWG00Te1NEnt2">
         </stripe-buy-button>
       `);
       setDonateHTML(`
         <stripe-buy-button
-          id="stripe-donate-btn"
           buy-button-id="buy_btn_1ROp2SJrLBeT2yh0WBkuBBgL"
           publishable-key="pk_live_51LNfK8JrLBeT2yh0M9LkMQzvHpAWiU3sdjmRRm9nWH4nVJ3x8FIglwwOnPgfuoc2F4ZWBZulOJl5FiBillt4cTWG00Te1NEnt2">
         </stripe-buy-button>
@@ -70,22 +66,21 @@ const App = () => {
   const updateUserState = async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
-      const newUserId = user.attributes.email;
-      const newUserSub = user.attributes.sub;
-      const newLevel = user.attributes["custom:level"] || user.attributes["level"];
-      setUserId(newUserId);
-      setUserSub(newUserSub);
+      setUserId(user.attributes.email);
+      setUserSub(user.attributes.sub);
       setIsTrailblazer(user.attributes["custom:isTrailblazer"] === "true");
-      setLevel(newLevel);
-      return { userId: newUserId, userSub: newUserSub, level: newLevel };
+      setLevel(user.attributes["custom:level"] || user.attributes.level);
+      return true;
     } catch {
       setUserId(null);
       setUserSub(null);
+      setIsTrailblazer(false);
       setLevel(null);
-      return null;
+      return false;
     }
   };
 
+  // on-mount: check auth
   useEffect(() => {
     (async () => {
       const auth = await updateUserState();
@@ -93,16 +88,16 @@ const App = () => {
     })();
   }, []);
 
+  // listen for signIn/signOut
   useEffect(() => {
     const listener = ({ payload }) => {
       if (payload.event === "signIn" || payload.event === "signUp") {
-        updateUserState().then((newState) => {
-          if (newState) setView("dashboard");
-        });
+        updateUserState().then(ok => ok && setView("dashboard"));
       }
       if (payload.event === "signOut") {
         setUserId(null);
         setUserSub(null);
+        setIsTrailblazer(false);
         setLevel(null);
         setView("home");
       }
@@ -111,6 +106,7 @@ const App = () => {
     return () => Hub.remove("auth", listener);
   }, []);
 
+  // hash‐based routing
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash;
@@ -143,6 +139,7 @@ const App = () => {
     return () => window.removeEventListener("hashchange", handleHash);
   }, [userId]);
 
+  // fetch entries
   const fetchEntries = useCallback(async () => {
     const uid =
       view === "dashboard"
@@ -174,18 +171,9 @@ const App = () => {
     }
   }, [view, userId, sharedUserId, userSub, refreshEntries, fetchEntries]);
 
-  const handleEntryLogged = () => setRefreshEntries((p) => !p);
+  const handleEntryLogged = () => setRefreshEntries(p => !p);
 
-  // *** NEW: Mobile handlers target the IDs above
-  const handleMobilePurchase = () => {
-    const elm = document.getElementById("stripe-hoodie-btn");
-    if (elm) elm.click();
-  };
-  const handleMobileSupport = () => {
-    const elm = document.getElementById("stripe-donate-btn");
-    if (elm) elm.click();
-  };
-
+  // render switch
   const renderContent = () => {
     switch (view) {
       case "home":
@@ -194,15 +182,9 @@ const App = () => {
             <h1 className="landing-title">Join Club Redstone</h1>
 
             <div className="hero-section">
-              <img
-                src={AR6}
-                alt="Aquarius Rising Promo"
-                className="home-hero-image"
-              />
+              <img src={AR6} alt="Aquarius Rising Promo" className="home-hero-image" />
               <div className="hero-description">
-                <p>
-                  Aquarius Rising is an upcoming third-person survival shooter for PC.
-                </p>
+                <p>Aquarius Rising is an upcoming third-person survival shooter for PC.</p>
                 <h2>The Farm</h2>
                 <p>Collect. Germinate. Grow. Harvest.</p>
                 <p>
@@ -234,12 +216,8 @@ const App = () => {
               Track your smoking sessions. Demo: Log a Session
             </h2>
             <StrainFormSwitcher
-              onEntryLogged={() => setDemoXPTrigger((t) => t + 1)}
-              previousStrains={[
-                "Blue Dream",
-                "OG Kush",
-                "Girl Scout Cookies",
-              ]}
+              onEntryLogged={() => setDemoXPTrigger(t => t + 1)}
+              previousStrains={["Blue Dream", "OG Kush", "Girl Scout Cookies"]}
             />
             <XPProgressBar demo triggerUpdate={demoXPTrigger} />
             <div className="screenshots">
@@ -274,13 +252,7 @@ const App = () => {
       case "merch":
         return <Merch />;
       case "achievements":
-        return (
-          <Achievements
-            entries={entries}
-            level={level}
-            userId={sharedUserId || userSub}
-          />
-        );
+        return <Achievements entries={entries} level={level} userId={sharedUserId || userSub} />;
       case "dashboard":
         return (
           <div className="main-content">
@@ -288,9 +260,7 @@ const App = () => {
               <StrainFormSwitcher
                 userId={userId}
                 onEntryLogged={handleEntryLogged}
-                previousStrains={[
-                  ...new Set(entries.map((e) => e.strain_name)),
-                ]}
+                previousStrains={[...new Set(entries.map(e => e.strain_name))]}
               />
             </div>
             <div className="xp-container">
@@ -327,18 +297,30 @@ const App = () => {
     <div className="app-container">
       <Navbar userId={userId} userSub={userSub} />
 
-      {/* Fixed right‐side panel with the two Stripe buttons */}
+      {/* desktop floating panel */}
       <div className="stripe-fixed-panel">
         <div dangerouslySetInnerHTML={{ __html: hoodieHTML }} />
         <div dangerouslySetInnerHTML={{ __html: donateHTML }} />
       </div>
 
-      {/* MOBILE ONLY: simple bottom buttons */}
+      {/* mobile bottom links */}
       <div className="mobile-quick-links">
-        <button onClick={handleMobilePurchase}>Purchase Hoodie</button>
-        <button onClick={handleMobileSupport}>
+        <a
+          href="https://buy.stripe.com/9B6cN6cZ23Ku5CvgPD0oM06"
+          className="mobile-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Purchase Hoodie
+        </a>
+        <a
+          href="https://donate.stripe.com/7sI5kN9bc1cU1nq28a"
+          className="mobile-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           Support Club Redstone
-        </button>
+        </a>
       </div>
 
       {renderContent()}
