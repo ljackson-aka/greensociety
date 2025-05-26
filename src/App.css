@@ -540,3 +540,26 @@ a:hover {
   margin: 20px auto;     /* vertical spacing + horizontal auto‐centering */
   font-size: 3rem;       /* your existing size */
 }
+/* Mobile: horizontal, centered, top‑fixed Stripe buttons */
+@media (max-width: 768px) {
+  .stripe-fixed-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 0;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 0;
+    z-index: 1000;
+  }
+
+  .stripe-fixed-panel stripe-buy-button {
+    width: 140px;
+    height: 48px;
+  }
+}
