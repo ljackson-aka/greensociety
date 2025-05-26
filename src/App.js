@@ -303,6 +303,12 @@ const App = () => {
         <div dangerouslySetInnerHTML={{ __html: donateHTML }} />
       </div>
 
+      {/* MOBILE ONLY: simple bottom links */}
+      <div className="mobile-quick-links">
+        <a href="#purchase-hoodie">Purchase Hoodie</a>
+        <a href="#support">Support Club Redstone</a>
+      </div>
+
       {renderContent()}
     </div>
   );

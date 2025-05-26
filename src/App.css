@@ -540,40 +540,37 @@ a:hover {
   margin: 20px auto;     /* vertical spacing + horizontal auto‐centering */
   font-size: 3rem;       /* your existing size */
 }
+/* ---------------------------------------------------------------- */
+/* Mobile‑only quick‑links bar, desktop unchanged above */
+
+.mobile-quick-links {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  /* hide the floating stripe buttons on mobile */
   .stripe-fixed-panel {
-    /* bottom bar instead of right rail */
+    display: none !important;
+  }
+
+  /* show simple text links at bottom */
+  .mobile-quick-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    top: auto;                     /* cancel any earlier top positioning */
-    
-    display: flex !important;      
-    flex-direction: row !important; /* ensure horizontal */
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 8px !important;            
-    
-    padding: 4px 0 !important;
-    background: rgba(0, 0, 0, 0.9) !important;
+    padding: 8px 0;
+    background: rgba(20, 20, 20, 0.95);
     z-index: 1000;
-    transform: none !important;     /* cancel desktop translateY */
   }
 
-  /* each wrapper div around your buy‑button */
-  .stripe-fixed-panel > div {
-    flex: 0 0 auto;
-    width: 80px !important;
-    height: 32px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* force the buy‑button itself to fill its wrapper */
-  .stripe-fixed-panel stripe-buy-button {
-    display: inline-block;
-    width: 100% !important;
-    height: 100% !important;
+  .mobile-quick-links a {
+    color: var(--accent-red);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 8px;
   }
 }
