@@ -1,0 +1,36 @@
+.merch-page {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    padding: 40px 20px;
+  }
+  
+  /* Flex-friendly invisible card container */
+  .product-card {
+    width: 320px;
+    padding: 20px;
+    border-radius: 10px;
+    background: transparent; /* Invisible box */
+    box-shadow: none;        /* No visual borders */
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* 🧢 Home Page Merch Row */
+.home-merch-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 40px auto;
+  max-width: 1000px;
+}
+
+.home-merch-row .product-card {
+  flex: 1 1 30%;
+  max-width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
