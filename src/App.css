@@ -561,7 +561,7 @@ a:hover {
 
   /* Shrink the Stripe buttons */
   .stripe-fixed-panel stripe-buy-button {
-    width: 100px;  /* smaller width */
-    height: 40px;  /* smaller height */
+    width: 70px;  /* smaller width */
+    height: 10px;  /* smaller height */
   }
 }
