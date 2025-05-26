@@ -48,14 +48,17 @@ const App = () => {
     script.src = "https://js.stripe.com/v3/buy-button.js";
     script.async = true;
     script.onload = () => {
+      // give each button an ID so we can target it
       setHoodieHTML(`
         <stripe-buy-button
+          id="stripe-hoodie-btn"
           buy-button-id="buy_btn_1RSb9oJrLBeT2yh0f4hgKoHj"
           publishable-key="pk_live_51LNfK8JrLBeT2yh0M9LkMQzvHpAWiU3sdjmRRm9nWH4nVJ3x8FIglwwOnPgfuoc2F4ZWBZulOJl5FiBillt4cTWG00Te1NEnt2">
         </stripe-buy-button>
       `);
       setDonateHTML(`
         <stripe-buy-button
+          id="stripe-donate-btn"
           buy-button-id="buy_btn_1ROp2SJrLBeT2yh0WBkuBBgL"
           publishable-key="pk_live_51LNfK8JrLBeT2yh0M9LkMQzvHpAWiU3sdjmRRm9nWH4nVJ3x8FIglwwOnPgfuoc2F4ZWBZulOJl5FiBillt4cTWG00Te1NEnt2">
         </stripe-buy-button>
@@ -64,7 +67,6 @@ const App = () => {
     document.head.appendChild(script);
   }, []);
 
-  // Restore your original updateUserState that sets userId, userSub, level
   const updateUserState = async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
@@ -174,18 +176,14 @@ const App = () => {
 
   const handleEntryLogged = () => setRefreshEntries((p) => !p);
 
-  // Mobile quick‑link handlers to trigger the actual stripe-buy-buttons
+  // *** NEW: Mobile handlers target the IDs above
   const handleMobilePurchase = () => {
-    const btn = document.querySelector(
-      'stripe-buy-button[buy-button-id="buy_btn_1RSb9oJrLBeT2yh0f4hgKoHj"]'
-    );
-    if (btn) btn.click();
+    const elm = document.getElementById("stripe-hoodie-btn");
+    if (elm) elm.click();
   };
   const handleMobileSupport = () => {
-    const btn = document.querySelector(
-      'stripe-buy-button[buy-button-id="buy_btn_1ROp2SJrLBeT2yh0WBkuBBgL"]'
-    );
-    if (btn) btn.click();
+    const elm = document.getElementById("stripe-donate-btn");
+    if (elm) elm.click();
   };
 
   const renderContent = () => {
@@ -203,30 +201,29 @@ const App = () => {
               />
               <div className="hero-description">
                 <p>
-                  Aquarius Rising is an upcoming third-person survival shooter
-                  for PC.
+                  Aquarius Rising is an upcoming third-person survival shooter for PC.
                 </p>
                 <h2>The Farm</h2>
                 <p>Collect. Germinate. Grow. Harvest.</p>
                 <p>
-                  Acquire rare seeds from drops or purchase them directly from
-                  the in‑game or web‑based auction house.
+                  Acquire rare seeds from drops or purchase them directly from the
+                  in‑game or web‑based auction house.
                 </p>
                 <p>
-                  Sell to the government for safety or the black market for risk
-                  and reward.
+                  Sell to the government for safety or the black market for risk and
+                  reward.
                 </p>
                 <h2>Retribution (PvE)</h2>
                 <p>
-                  Growers with high rep must defend against government raids.
-                  Defend your farm.
+                  Growers with high rep must defend against government raids. Defend
+                  your farm.
                 </p>
                 <h2>Payback (PvP)</h2>
                 <p>Your black market deals hurt others. Pay it back in blood.</p>
                 <p>
                   <strong>
-                    Aquarius Rising will be available to all subscribers of
-                    Club Redstone.
+                    Aquarius Rising will be available to all subscribers of Club
+                    Redstone.
                   </strong>
                 </p>
               </div>
