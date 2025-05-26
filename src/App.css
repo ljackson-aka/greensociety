@@ -541,19 +541,27 @@ a:hover {
   font-size: 3rem;       /* your existing size */
 }
 @media (max-width: 768px) {
+  /* Move panel to bottom and stretch edge‑to‑edge */
   .stripe-fixed-panel {
     position: fixed;
+    top: auto;
     bottom: 0;
     left: 0;
     right: 0;
+    transform: none;       /* cancel the vertical centering */
     display: flex;
+    flex-direction: row;   /* horizontal layout */
     justify-content: space-around;
-    padding: 8px 0;
-    background: rgba(0,0,0,0.85);
+    align-items: center;
+    padding: 6px 0;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 0;      /* no rounded corners */
     z-index: 1000;
   }
+
+  /* Shrink the Stripe buttons */
   .stripe-fixed-panel stripe-buy-button {
-    width: 120px;
-    height: 48px;
+    width: 100px;  /* smaller width */
+    height: 40px;  /* smaller height */
   }
 }
