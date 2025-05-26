@@ -541,31 +541,36 @@ a:hover {
   font-size: 3rem;       /* your existing size */
 }
 @media (max-width: 768px) {
-  /* move from right‑rail into a bottom bar */
   .stripe-fixed-panel {
+    /* bottom bar instead of right rail */
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 6px 0;
-    background: rgba(0, 0, 0, 0.85);
+    top: auto;                     /* cancel any earlier top positioning */
+    
+    display: flex !important;      
+    flex-direction: row !important; /* ensure horizontal */
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;            
+    
+    padding: 4px 0 !important;
+    background: rgba(0, 0, 0, 0.9) !important;
     z-index: 1000;
-    transform: none;    /* cancel the translateY on mobile */
+    transform: none !important;     /* cancel desktop translateY */
   }
 
-  /* shrink each wrapper <div> that holds a stripe-buy-button */
+  /* each wrapper div around your buy‑button */
   .stripe-fixed-panel > div {
     flex: 0 0 auto;
-    width: 100px !important;
-    height: 40px !important;
-    padding: 0;
-    margin: 0;
+    width: 80px !important;
+    height: 32px !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* force the buy‑button to fill its wrapper */
+  /* force the buy‑button itself to fill its wrapper */
   .stripe-fixed-panel stripe-buy-button {
     display: inline-block;
     width: 100% !important;
