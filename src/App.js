@@ -64,20 +64,23 @@ const App = () => {
     document.head.appendChild(script);
   }, []);
 
+  // Restore your original updateUserState that sets userId, userSub, level
   const updateUserState = async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
-      setUserId(user.attributes.email);
-      setUserSub(user.attributes.sub);
+      const newUserId = user.attributes.email;
+      const newUserSub = user.attributes.sub;
+      const newLevel = user.attributes["custom:level"] || user.attributes["level"];
+      setUserId(newUserId);
+      setUserSub(newUserSub);
       setIsTrailblazer(user.attributes["custom:isTrailblazer"] === "true");
-      setLevel(user.attributes["custom:level"] || user.attributes.level);
-      return true;
+      setLevel(newLevel);
+      return { userId: newUserId, userSub: newUserSub, level: newLevel };
     } catch {
       setUserId(null);
       setUserSub(null);
-      setIsTrailblazer(false);
       setLevel(null);
-      return false;
+      return null;
     }
   };
 
@@ -91,12 +94,13 @@ const App = () => {
   useEffect(() => {
     const listener = ({ payload }) => {
       if (payload.event === "signIn" || payload.event === "signUp") {
-        updateUserState().then(ok => ok && setView("dashboard"));
+        updateUserState().then((newState) => {
+          if (newState) setView("dashboard");
+        });
       }
       if (payload.event === "signOut") {
         setUserId(null);
         setUserSub(null);
-        setIsTrailblazer(false);
         setLevel(null);
         setView("home");
       }
@@ -168,7 +172,21 @@ const App = () => {
     }
   }, [view, userId, sharedUserId, userSub, refreshEntries, fetchEntries]);
 
-  const handleEntryLogged = () => setRefreshEntries(p => !p);
+  const handleEntryLogged = () => setRefreshEntries((p) => !p);
+
+  // Mobile quick‑link handlers to trigger the actual stripe-buy-buttons
+  const handleMobilePurchase = () => {
+    const btn = document.querySelector(
+      'stripe-buy-button[buy-button-id="buy_btn_1RSb9oJrLBeT2yh0f4hgKoHj"]'
+    );
+    if (btn) btn.click();
+  };
+  const handleMobileSupport = () => {
+    const btn = document.querySelector(
+      'stripe-buy-button[buy-button-id="buy_btn_1ROp2SJrLBeT2yh0WBkuBBgL"]'
+    );
+    if (btn) btn.click();
+  };
 
   const renderContent = () => {
     switch (view) {
@@ -178,32 +196,37 @@ const App = () => {
             <h1 className="landing-title">Join Club Redstone</h1>
 
             <div className="hero-section">
-              <img src={AR6} alt="Aquarius Rising Promo" className="home-hero-image" />
+              <img
+                src={AR6}
+                alt="Aquarius Rising Promo"
+                className="home-hero-image"
+              />
               <div className="hero-description">
                 <p>
-                  Aquarius Rising is an upcoming third-person survival shooter for PC.
+                  Aquarius Rising is an upcoming third-person survival shooter
+                  for PC.
                 </p>
                 <h2>The Farm</h2>
                 <p>Collect. Germinate. Grow. Harvest.</p>
                 <p>
-                  Acquire rare seeds from drops or purchase them directly from the
-                  in‑game or web‑based auction house.
+                  Acquire rare seeds from drops or purchase them directly from
+                  the in‑game or web‑based auction house.
                 </p>
                 <p>
-                  Sell to the government for safety or the black market for risk and
-                  reward.
+                  Sell to the government for safety or the black market for risk
+                  and reward.
                 </p>
                 <h2>Retribution (PvE)</h2>
                 <p>
-                  Growers with high rep must defend against government raids. Defend
-                  your farm.
+                  Growers with high rep must defend against government raids.
+                  Defend your farm.
                 </p>
                 <h2>Payback (PvP)</h2>
                 <p>Your black market deals hurt others. Pay it back in blood.</p>
                 <p>
                   <strong>
-                    Aquarius Rising will be available to all subscribers of Club
-                    Redstone.
+                    Aquarius Rising will be available to all subscribers of
+                    Club Redstone.
                   </strong>
                 </p>
               </div>
@@ -214,8 +237,12 @@ const App = () => {
               Track your smoking sessions. Demo: Log a Session
             </h2>
             <StrainFormSwitcher
-              onEntryLogged={() => setDemoXPTrigger(t => t + 1)}
-              previousStrains={["Blue Dream", "OG Kush", "Girl Scout Cookies"]}
+              onEntryLogged={() => setDemoXPTrigger((t) => t + 1)}
+              previousStrains={[
+                "Blue Dream",
+                "OG Kush",
+                "Girl Scout Cookies",
+              ]}
             />
             <XPProgressBar demo triggerUpdate={demoXPTrigger} />
             <div className="screenshots">
@@ -251,7 +278,11 @@ const App = () => {
         return <Merch />;
       case "achievements":
         return (
-          <Achievements entries={entries} level={level} userId={sharedUserId || userSub} />
+          <Achievements
+            entries={entries}
+            level={level}
+            userId={sharedUserId || userSub}
+          />
         );
       case "dashboard":
         return (
@@ -260,7 +291,9 @@ const App = () => {
               <StrainFormSwitcher
                 userId={userId}
                 onEntryLogged={handleEntryLogged}
-                previousStrains={[...new Set(entries.map(e => e.strain_name))]}
+                previousStrains={[
+                  ...new Set(entries.map((e) => e.strain_name)),
+                ]}
               />
             </div>
             <div className="xp-container">
@@ -303,10 +336,12 @@ const App = () => {
         <div dangerouslySetInnerHTML={{ __html: donateHTML }} />
       </div>
 
-      {/* MOBILE ONLY: simple bottom links */}
+      {/* MOBILE ONLY: simple bottom buttons */}
       <div className="mobile-quick-links">
-        <a href="#purchase-hoodie">Purchase Hoodie</a>
-        <a href="#support">Support Club Redstone</a>
+        <button onClick={handleMobilePurchase}>Purchase Hoodie</button>
+        <button onClick={handleMobileSupport}>
+          Support Club Redstone
+        </button>
       </div>
 
       {renderContent()}
