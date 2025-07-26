@@ -16,11 +16,6 @@ import Speak from "./Speak";
 import Merch from "./Merch";
 import "./App.css";
 
-import demo1 from "./demo1.jpg";
-import demo2 from "./demo2.jpg";
-import demo3 from "./demo3.jpg";
-import AR6 from "./AR6.png";
-
 const STRAIN_API_URL =
   "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
 
@@ -37,11 +32,8 @@ const App = () => {
   const [sharedUserId, setSharedUserId] = useState(null);
   const [demoXPTrigger, setDemoXPTrigger] = useState(0);
 
-  // HTML for the two Stripe buttons
   const [hoodieHTML, setHoodieHTML] = useState("");
-  const [donateHTML, setDonateHTML] = useState("");
 
-  // Load Stripe script and prepare both button HTML blocks
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://js.stripe.com/v3/buy-button.js";
@@ -50,12 +42,6 @@ const App = () => {
       setHoodieHTML(`
         <stripe-buy-button
           buy-button-id="buy_btn_1RSb9oJrLBeT2yh0f4hgKoHj"
-          publishable-key="pk_live_51LNfK8JrLBeT2yh0M9LkMQzvHpAWiU3sdjmRRm9nWH4nVJ3x8FIglwwOnPgfuoc2F4ZWBZulOJl5FiBillt4cTWG00Te1NEnt2">
-        </stripe-buy-button>
-      `);
-      setDonateHTML(`
-        <stripe-buy-button
-          buy-button-id="buy_btn_1ROp2SJrLBeT2yh0WBkuBBgL"
           publishable-key="pk_live_51LNfK8JrLBeT2yh0M9LkMQzvHpAWiU3sdjmRRm9nWH4nVJ3x8FIglwwOnPgfuoc2F4ZWBZulOJl5FiBillt4cTWG00Te1NEnt2">
         </stripe-buy-button>
       `);
@@ -80,7 +66,6 @@ const App = () => {
     }
   };
 
-  // on-mount: check auth
   useEffect(() => {
     (async () => {
       const auth = await updateUserState();
@@ -88,7 +73,6 @@ const App = () => {
     })();
   }, []);
 
-  // listen for signIn/signOut
   useEffect(() => {
     const listener = ({ payload }) => {
       if (payload.event === "signIn" || payload.event === "signUp") {
@@ -106,7 +90,6 @@ const App = () => {
     return () => Hub.remove("auth", listener);
   }, []);
 
-  // hash‐based routing
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash;
@@ -139,7 +122,6 @@ const App = () => {
     return () => window.removeEventListener("hashchange", handleHash);
   }, [userId]);
 
-  // fetch entries
   const fetchEntries = useCallback(async () => {
     const uid =
       view === "dashboard"
@@ -173,65 +155,12 @@ const App = () => {
 
   const handleEntryLogged = () => setRefreshEntries(p => !p);
 
-  // render switch
   const renderContent = () => {
     switch (view) {
       case "home":
         return (
           <div className="landing">
             <h1 className="landing-title">Join Club Redstone</h1>
-
-            <div className="hero-section">
-              <img src={AR6} alt="Aquarius Rising Promo" className="home-hero-image" />
-              <div className="hero-description">
-                <p>Aquarius Rising is an upcoming third-person survival shooter for PC.</p>
-                <h2>The Farm</h2>
-                <p>Collect. Germinate. Grow. Harvest.</p>
-                <p>
-                  Acquire rare seeds from drops or purchase them directly from the
-                  in‑game or web‑based auction house.
-                </p>
-                <p>
-                  Sell to the government for safety or the black market for risk and
-                  reward.
-                </p>
-                <h2>Retribution (PvE)</h2>
-                <p>
-                  Growers with high rep must defend against government raids. Defend
-                  your farm.
-                </p>
-                <h2>Payback (PvP)</h2>
-                <p>Your black market deals hurt others. Pay it back in blood.</p>
-                <p>
-                  <strong>
-                    Aquarius Rising will be available to all subscribers of Club
-                    Redstone.
-                  </strong>
-                </p>
-              </div>
-            </div>
-
-            <hr />
-            <h2 style={{ textAlign: "center" }}>
-              Track your smoking sessions. Demo: Log a Session
-            </h2>
-            <StrainFormSwitcher
-              onEntryLogged={() => setDemoXPTrigger(t => t + 1)}
-              previousStrains={["Blue Dream", "OG Kush", "Girl Scout Cookies"]}
-            />
-            <XPProgressBar demo triggerUpdate={demoXPTrigger} />
-            <div className="screenshots">
-              {[demo1, demo2, demo3].map((img, i) => (
-                <div className="screenshot-item" key={i}>
-                  <p className="caption">
-                    {`${i + 1}. ${
-                      ["Add a Session", "Track stats and tendencies", "See history"][i]
-                    }`}
-                  </p>
-                  <img src={img} alt={`Demo ${i + 1}`} />
-                </div>
-              ))}
-            </div>
           </div>
         );
       case "signin":
@@ -300,7 +229,6 @@ const App = () => {
       {/* desktop floating panel */}
       <div className="stripe-fixed-panel">
         <div dangerouslySetInnerHTML={{ __html: hoodieHTML }} />
-        <div dangerouslySetInnerHTML={{ __html: donateHTML }} />
       </div>
 
       {/* mobile bottom links */}
@@ -312,14 +240,6 @@ const App = () => {
           rel="noopener noreferrer"
         >
           Purchase Hoodie
-        </a>
-        <a
-          href="https://donate.stripe.com/7sI5kN9bc1cU1nq28a"
-          className="mobile-link"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Support Club Redstone
         </a>
       </div>
 
