@@ -14,10 +14,14 @@ import Comms from "./Comms";
 import Achievements from "./Achievements";
 import Speak from "./Speak";
 import Merch from "./Merch";
+import PublicTimeline from "./PublicTimeline";
 import "./App.css";
 
 const STRAIN_API_URL =
   "https://lfefnjm626.execute-api.us-east-2.amazonaws.com/prod/strain-entry";
+
+// Will be set once Lambda + Dynamo is ready
+const PUBLIC_TIMELINE_API_URL = "https://ke44zkaoki.execute-api.us-east-2.amazonaws.com/prod/public-timeline";
 
 const App = () => {
   const [userId, setUserId] = useState(null);
@@ -30,8 +34,6 @@ const App = () => {
   const [refreshEntries, setRefreshEntries] = useState(false);
   const [view, setView] = useState("home");
   const [sharedUserId, setSharedUserId] = useState(null);
-  const [demoXPTrigger, setDemoXPTrigger] = useState(0);
-
   const [hoodieHTML, setHoodieHTML] = useState("");
 
   useEffect(() => {
@@ -76,7 +78,7 @@ const App = () => {
   useEffect(() => {
     const listener = ({ payload }) => {
       if (payload.event === "signIn" || payload.event === "signUp") {
-        updateUserState().then(ok => ok && setView("dashboard"));
+        updateUserState().then((ok) => ok && setView("dashboard"));
       }
       if (payload.event === "signOut") {
         setUserId(null);
@@ -101,21 +103,13 @@ const App = () => {
           if (uid) setSharedUserId(uid);
         }
         setView("achievements");
-      } else if (hash === "#leaderboard") {
-        setView("leaderboard");
-      } else if (hash === "#signin") {
-        setView("signin");
-      } else if (hash === "#admin") {
-        setView("admin");
-      } else if (hash === "#comms") {
-        setView("comms");
-      } else if (hash === "#merch") {
-        setView("merch");
-      } else if (hash === "#speak") {
-        setView("speak");
-      } else {
-        setView(userId ? "dashboard" : "home");
-      }
+      } else if (hash === "#leaderboard") setView("leaderboard");
+      else if (hash === "#signin") setView("signin");
+      else if (hash === "#admin") setView("admin");
+      else if (hash === "#comms") setView("comms");
+      else if (hash === "#merch") setView("merch");
+      else if (hash === "#speak") setView("speak");
+      else setView(userId ? "dashboard" : "home");
     };
     window.addEventListener("hashchange", handleHash);
     handleHash();
@@ -129,7 +123,9 @@ const App = () => {
         : view === "achievements"
         ? sharedUserId || userSub
         : null;
+
     if (!uid) return;
+
     setLoading(true);
     try {
       const res = await fetch(`${STRAIN_API_URL}?user_id=${encodeURIComponent(uid)}`);
@@ -137,6 +133,7 @@ const App = () => {
       let data = await res.json();
       if (typeof data.body === "string") data = JSON.parse(data.body);
       setEntries(data.data || []);
+      setError("");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -153,7 +150,7 @@ const App = () => {
     }
   }, [view, userId, sharedUserId, userSub, refreshEntries, fetchEntries]);
 
-  const handleEntryLogged = () => setRefreshEntries(p => !p);
+  const handleEntryLogged = () => setRefreshEntries((p) => !p);
 
   const renderContent = () => {
     switch (view) {
@@ -161,8 +158,10 @@ const App = () => {
         return (
           <div className="landing">
             <h1 className="landing-title">Join Club Redstone</h1>
+            <PublicTimeline apiUrl={PUBLIC_TIMELINE_API_URL || null} />
           </div>
         );
+
       case "signin":
         return (
           <AuthContainer
@@ -172,16 +171,28 @@ const App = () => {
             }}
           />
         );
+
       case "leaderboard":
         return <Leaderboard />;
+
       case "admin":
         return <AdminDashboard />;
+
       case "comms":
         return <Comms />;
+
       case "merch":
         return <Merch />;
+
       case "achievements":
-        return <Achievements entries={entries} level={level} userId={sharedUserId || userSub} />;
+        return (
+          <Achievements
+            entries={entries}
+            level={level}
+            userId={sharedUserId || userSub}
+          />
+        );
+
       case "dashboard":
         return (
           <div className="main-content">
@@ -189,20 +200,24 @@ const App = () => {
               <StrainFormSwitcher
                 userId={userId}
                 onEntryLogged={handleEntryLogged}
-                previousStrains={[...new Set(entries.map(e => e.strain_name))]}
+                previousStrains={[...new Set(entries.map((e) => e.strain_name))]}
               />
             </div>
+
             <div className="xp-container">
               <XPProgressBar userId={userId} triggerUpdate={refreshEntries} />
             </div>
+
             <div className="badges-box">
               <h3>Badges</h3>
               <TrailblazerBadge isTrailblazer={isTrailblazer} />
             </div>
+
             <div className="content">
               <div className="stats-panel">
                 <StrainStats entries={entries} />
               </div>
+
               <div className="entries-panel">
                 {loading ? (
                   <p className="loading">Loading entries...</p>
@@ -215,8 +230,10 @@ const App = () => {
             </div>
           </div>
         );
+
       case "speak":
         return <Speak />;
+
       default:
         return null;
     }
@@ -226,12 +243,10 @@ const App = () => {
     <div className="app-container">
       <Navbar userId={userId} userSub={userSub} />
 
-      {/* desktop floating panel */}
       <div className="stripe-fixed-panel">
         <div dangerouslySetInnerHTML={{ __html: hoodieHTML }} />
       </div>
 
-      {/* mobile bottom links */}
       <div className="mobile-quick-links">
         <a
           href="https://buy.stripe.com/9B6cN6cZ23Ku5CvgPD0oM06"

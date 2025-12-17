@@ -1,5 +1,6 @@
 // CasualStrainForm.js
 import React, { useState } from "react";
+import { Auth } from "aws-amplify";
 import "./StrainForm.css";
 
 const CasualStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
@@ -19,7 +20,7 @@ const CasualStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
       return;
     }
 
-    // If no userId is passed, assume demo mode.
+    // Demo mode (no auth, no API call)
     if (!userId) {
       setMessage("Demo: Entry logged successfully!");
       setTimeout(() => setMessage(""), 3000);
@@ -30,7 +31,6 @@ const CasualStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
       return;
     }
 
-    // Build the request payload.
     const formData = {
       user_id: userId,
       strain_name: strainName,
@@ -39,10 +39,16 @@ const CasualStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
     };
 
     try {
-      // Send POST request to log strain entry.
+      // 🔐 Get Cognito ID token
+      const session = await Auth.currentSession();
+      const idToken = session.getIdToken().getJwtToken();
+
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`,
+        },
         body: JSON.stringify(formData),
       });
 
@@ -52,9 +58,8 @@ const CasualStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
 
       const data = await response.json();
       console.log("Success:", data);
-      setMessage("Entry logged successfully!");
 
-      // Reset form fields.
+      setMessage("Entry logged successfully!");
       setStrainName("");
       setStrainType("");
       setMethod("");

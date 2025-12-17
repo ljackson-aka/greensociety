@@ -1,4 +1,6 @@
+// HardcoreStrainForm.js
 import React, { useState } from "react";
+import { Auth } from "aws-amplify";
 import "./StrainForm.css";
 
 const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => {
@@ -21,6 +23,7 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
       return;
     }
 
+    // Demo mode
     if (!userId) {
       setMessage("Demo: Entry logged successfully!");
       setTimeout(() => setMessage(""), 3000);
@@ -33,7 +36,11 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
     }
 
     try {
-      // 1. Log the session without weight via the main lambda.
+      // 🔐 Get Cognito ID token ONCE
+      const session = await Auth.currentSession();
+      const idToken = session.getIdToken().getJwtToken();
+
+      // 1️⃣ Log the session (no weight)
       const sessionPayload = {
         user_id: userId,
         strain_name: strainName,
@@ -43,7 +50,10 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
 
       const sessionResponse = await fetch(SESSION_API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`,
+        },
         body: JSON.stringify(sessionPayload),
       });
 
@@ -55,11 +65,12 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
 
       const sessionData = await sessionResponse.json();
       const timestamp = sessionData.timestamp;
+
       if (!timestamp) {
         throw new Error("Timestamp not returned from session logging.");
       }
 
-      // 2. Update the weight via the new weight lambda.
+      // 2️⃣ Update the weight
       const weightPayload = {
         user_id: userId,
         timestamp: timestamp,
@@ -68,7 +79,10 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
 
       const weightResponse = await fetch(WEIGHT_API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`,
+        },
         body: JSON.stringify(weightPayload),
       });
 
@@ -79,11 +93,13 @@ const HardcoreStrainForm = ({ userId, onEntryLogged, previousStrains = [] }) => 
       }
 
       await weightResponse.json();
+
       setMessage("Entry and weight updated successfully!");
       setStrainName("");
       setStrainType("");
       setMethod("");
       setWeight("");
+
       if (onEntryLogged) onEntryLogged();
     } catch (error) {
       console.error("Error:", error);
