@@ -1,7 +1,6 @@
 version: 1
 
 frontend:
-  appRoot: .
   phases:
     preBuild:
       commands:

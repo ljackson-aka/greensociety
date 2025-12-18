@@ -153,7 +153,7 @@ const PublicTimeline = ({ apiUrl }) => {
             smoked a <strong>{item.method}</strong> of{" "}
             <strong>{item.strain_name}</strong>
             {isLive(item.timestamp) && (
-              <span className="live-badge">LIVE</span>
+              <span className="live-badge">in session</span>
             )}
           </div>
 
